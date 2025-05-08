@@ -1,71 +1,86 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Vascular Clinic Patient DB</title>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vascular Clinic - Patient DB</title>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; margin: 40px; }
-    .hidden { display: none; }
-    input, textarea { margin-bottom: 10px; width: 100%; padding: 8px; }
-    label { font-weight: bold; }
-    .form-section { margin-bottom: 20px; }
+    body { font-family: 'Segoe UI', sans-serif; padding: 30px; background: #f0f4f8; text-align: center; }
+    input, select, textarea, button { margin: 10px 0; padding: 10px; width: 90%; max-width: 400px; border-radius: 6px; border: 1px solid #ccc; }
+    #app, #home, #formSection, #tableSection, #loading { display: none; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
+    th, td { border: 1px solid #ddd; padding: 10px; }
+    th { background-color: #007acc; color: white; }
+    .icon-button {
+      display: inline-block; width: 150px; height: 150px; margin: 20px;
+      background: #007acc; color: white; font-size: 18px; border-radius: 12px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .icon-button:hover { background: #005fa3; }
+    .icon-button i { font-size: 40px; margin-bottom: 10px; }
   </style>
 </head>
 <body>
-  <h2>Vascular & Transplant Surgery Clinic - Patient Database</h2>
-
-  <!-- Login Section -->
-  <div id="login-section">
+  <h2>Vascular & Transplant Patient Manager</h2>  <!-- Login -->  <div id="login">
     <h3>Admin Login</h3>
-    <input type="email" id="email" placeholder="Admin Email" required />
-    <input type="password" id="password" placeholder="Password" required />
+    <input id="email" type="email" placeholder="Email" />
+    <input id="password" type="password" placeholder="Password" />
     <button onclick="login()">Login</button>
-    <p id="login-error" style="color: red;"></p>
+    <div id="loading">Logging in...</div>
+  </div>  <!-- App -->  <div id="app">
+    <button onclick="logout()">Logout</button><div id="home">
+  <h3>Welcome, Admin</h3>
+  <div class="icon-button" onclick="showForm()">
+    <i>+</i>
+    Add Patient
   </div>
-
-  <!-- Patient Form Section -->
-  <div id="form-section" class="hidden">
-    <h3>Add New Patient</h3>
-    <div class="form-section">
-      <label>Full Name</label>
-      <input type="text" id="name">
-
-      <label>Age</label>
-      <input type="number" id="age">
-
-      <label>Gender</label>
-      <input type="text" id="gender">
-
-      <label>Diagnosis</label>
-      <textarea id="diagnosis"></textarea>
-
-      <label>Interventions</label>
-      <textarea id="interventions"></textarea>
-
-      <label>Date of Visit</label>
-      <input type="date" id="visitDate">
-
-      <label>Consultant</label>
-      <input type="text" id="consultant">
-
-      <label>Hospital Stay (days)</label>
-      <input type="number" id="stay">
-
-      <label>Contact Number</label>
-      <input type="text" id="contact">
-
-      <label>Remarks / Notes</label>
-      <textarea id="notes"></textarea>
-    </div>
-    <button onclick="submitPatient()">Submit</button>
-    <button onclick="logout()">Logout</button>
-    <p id="submit-message" style="color: green;"></p>
+  <div class="icon-button" onclick="showTable()">
+    <i>📋</i>
+    Browse Patients
   </div>
+</div>
 
-  <script>
+<!-- Patient Form -->
+<div id="formSection">
+  <h3>Add Patient Data</h3>
+  <form id="patientForm">
+    <input id="name" placeholder="Full Name" required />
+    <input id="age" type="number" placeholder="Age" required />
+    <select id="gender">
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+    </select>
+    <input id="diagnosis" placeholder="Diagnosis" required />
+    <input id="interventions" placeholder="Interventions" required />
+    <input id="stay" type="number" placeholder="Hospital Stay (days)" />
+    <input id="date" placeholder="Date of Visit (YYYY-MM-DD)" required />
+    <input id="contact" placeholder="Contact Number" />
+    <textarea id="notes" placeholder="Remarks/Notes"></textarea>
+    <button type="submit">Submit</button>
+  </form>
+  <button onclick="goHome()">Back</button>
+</div>
+
+<!-- Patient Table -->
+<div id="tableSection">
+  <h3>All Patients</h3>
+  <table id="patientTable">
+    <thead>
+      <tr>
+        <th>Name</th><th>Age</th><th>Gender</th><th>Diagnosis</th>
+        <th>Interventions</th><th>Stay</th><th>Date</th>
+        <th>Contact</th><th>Notes</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <button onclick="goHome()">Back</button>
+</div>
+
+  </div>  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDNL5qz7CRfGG7KErrvZACMupDu5CBjXHY",
       authDomain: "vascular-unit-track.firebaseapp.com",
@@ -77,48 +92,74 @@
     const db = firebase.firestore();
 
     function login() {
+      document.getElementById("loading").style.display = "block";
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
       auth.signInWithEmailAndPassword(email, password)
         .then(() => {
-          document.getElementById("login-section").classList.add("hidden");
-          document.getElementById("form-section").classList.remove("hidden");
+          document.getElementById("login").style.display = "none";
+          document.getElementById("app").style.display = "block";
+          document.getElementById("home").style.display = "block";
         })
-        .catch(err => {
-          document.getElementById("login-error").innerText = err.message;
-        });
+        .catch(err => alert(err.message))
+        .finally(() => document.getElementById("loading").style.display = "none");
     }
 
     function logout() {
-      auth.signOut().then(() => {
-        document.getElementById("form-section").classList.add("hidden");
-        document.getElementById("login-section").classList.remove("hidden");
+      auth.signOut();
+      document.getElementById("login").style.display = "block";
+      document.getElementById("app").style.display = "none";
+    }
+
+    function showForm() {
+      document.getElementById("home").style.display = "none";
+      document.getElementById("formSection").style.display = "block";
+    }
+
+    function showTable() {
+      document.getElementById("home").style.display = "none";
+      document.getElementById("tableSection").style.display = "block";
+      loadPatients();
+    }
+
+    function goHome() {
+      document.getElementById("formSection").style.display = "none";
+      document.getElementById("tableSection").style.display = "none";
+      document.getElementById("home").style.display = "block";
+    }
+
+    document.getElementById("patientForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      db.collection("patients").add({
+        name: name.value,
+        age: age.value,
+        gender: gender.value,
+        diagnosis: diagnosis.value,
+        interventions: interventions.value,
+        stay: stay.value,
+        date: date.value,
+        contact: contact.value,
+        notes: notes.value
+      }).then(() => {
+        alert("Patient data added.");
+        document.getElementById("patientForm").reset();
+      });
+    });
+
+    function loadPatients() {
+      const tbody = document.querySelector("#patientTable tbody");
+      tbody.innerHTML = "";
+      db.collection("patients").get().then(snapshot => {
+        snapshot.forEach(doc => {
+          const d = doc.data();
+          const row = `<tr>
+            <td>${d.name}</td><td>${d.age}</td><td>${d.gender}</td><td>${d.diagnosis}</td>
+            <td>${d.interventions}</td><td>${d.stay}</td><td>${d.date}</td>
+            <td>${d.contact}</td><td>${d.notes}</td>
+          </tr>`;
+          tbody.innerHTML += row;
+        });
       });
     }
-
-    function submitPatient() {
-      const data = {
-        name: document.getElementById("name").value,
-        age: parseInt(document.getElementById("age").value),
-        gender: document.getElementById("gender").value,
-        diagnosis: document.getElementById("diagnosis").value,
-        interventions: document.getElementById("interventions").value,
-        visitDate: document.getElementById("visitDate").value,
-        consultant: document.getElementById("consultant").value,
-        stay: parseInt(document.getElementById("stay").value),
-        contact: document.getElementById("contact").value,
-        notes: document.getElementById("notes").value,
-        timestamp: new Date()
-      };
-
-      db.collection("patients").add(data)
-        .then(() => {
-          document.getElementById("submit-message").innerText = "Patient added successfully!";
-        })
-        .catch(err => {
-          document.getElementById("submit-message").innerText = err.message;
-        });
-    }
-  </script>
-</body>
+  </script></body>
 </html>
