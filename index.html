@@ -133,18 +133,22 @@
   <input type="text" id="searchInput" placeholder="Search by name..." oninput="filterPatients()" />
 
   <table border="1" width="100%" style="margin-top: 20px; border-collapse: collapse;">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Age</th>
-        <th>Gender</th>
-        <th>Visit Date</th>
-        <th>Diagnosis</th>
-      </tr>
-    </thead>
-    <tbody id="patientTableBody">
-      <!-- Patient rows will be inserted here -->
-    </tbody>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Age</th>
+      <th>Gender</th>
+      <th>Diagnosis</th>
+      <th>Interventions</th>
+      <th>Date of Visit</th>
+      <th>Hospital Stay (days)</th>
+      <th>Contact</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody id="patientTableBody">
+    <!-- Rows inserted here -->
+  </tbody>
   </table>
 
   <br>
@@ -227,7 +231,7 @@
 
 function loadPatients() {
   const tbody = document.getElementById("patientTableBody");
-  tbody.innerHTML = "<tr><td colspan='5'>Loading...</td></tr>";
+  tbody.innerHTML = "<tr><td colspan='9'>Loading...</td></tr>";
 
   db.collection("patients").orderBy("timestamp", "desc").get()
     .then(snapshot => {
@@ -236,15 +240,19 @@ function loadPatients() {
         const data = doc.data();
         rows += `
           <tr>
-            <td>${data.name}</td>
-            <td>${data.age}</td>
-            <td>${data.gender}</td>
-            <td>${data.visitDate}</td>
-            <td>${data.diagnosis}</td>
+            <td>${data.name || ""}</td>
+            <td>${data.age || ""}</td>
+            <td>${data.gender || ""}</td>
+            <td>${data.diagnosis || ""}</td>
+            <td>${data.interventions || ""}</td>
+            <td>${data.visitDate || ""}</td>
+            <td>${data.stay || ""}</td>
+            <td>${data.contact || ""}</td>
+            <td>${data.notes || ""}</td>
           </tr>
         `;
       });
-      tbody.innerHTML = rows || "<tr><td colspan='5'>No patients found.</td></tr>";
+      tbody.innerHTML = rows || "<tr><td colspan='9'>No patients found.</td></tr>";
     });
 }
 
