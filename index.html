@@ -84,7 +84,7 @@
     <h3>Welcome!</h3>
     <div class="action-buttons">
       <div class="big-btn" onclick="showAddPatient()">Add Patient</div>
-      <div class="big-btn" onclick="alert('Browse coming soon')">Browse Patients</div>
+      <div class="big-btn" onclick="showBrowsePatients()">Browse Patients</div>
     </div>
     <br><br>
     <button onclick="logout()">Logout</button>
@@ -125,6 +125,31 @@
     <button onclick="backToMenu()">Back</button>
     <p id="submit-message" style="color: green;"></p>
   </div>
+  <!-- Add this section below the form-section in your existing HTML -->
+
+<div class="container hidden" id="browse-section">
+  <h3>Patient List</h3>
+
+  <input type="text" id="searchInput" placeholder="Search by name..." oninput="filterPatients()" />
+
+  <table border="1" width="100%" style="margin-top: 20px; border-collapse: collapse;">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Gender</th>
+        <th>Visit Date</th>
+        <th>Diagnosis</th>
+      </tr>
+    </thead>
+    <tbody id="patientTableBody">
+      <!-- Patient rows will be inserted here -->
+    </tbody>
+  </table>
+
+  <br>
+  <button onclick="backToMenu()">Back</button>
+</div>
 
   <script>
     const firebaseConfig = {
@@ -194,6 +219,43 @@
           document.getElementById("submit-message").innerText = err.message;
         });
     }
+    function showBrowsePatients() {
+  document.getElementById("action-section").classList.add("hidden");
+  document.getElementById("browse-section").classList.remove("hidden");
+  loadPatients();
+}
+
+function loadPatients() {
+  const tbody = document.getElementById("patientTableBody");
+  tbody.innerHTML = "<tr><td colspan='5'>Loading...</td></tr>";
+
+  db.collection("patients").orderBy("timestamp", "desc").get()
+    .then(snapshot => {
+      let rows = "";
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        rows += `
+          <tr>
+            <td>${data.name}</td>
+            <td>${data.age}</td>
+            <td>${data.gender}</td>
+            <td>${data.visitDate}</td>
+            <td>${data.diagnosis}</td>
+          </tr>
+        `;
+      });
+      tbody.innerHTML = rows || "<tr><td colspan='5'>No patients found.</td></tr>";
+    });
+}
+
+function filterPatients() {
+  const input = document.getElementById("searchInput").value.toLowerCase();
+  const rows = document.querySelectorAll("#patientTableBody tr");
+  rows.forEach(row => {
+    const name = row.cells[0].innerText.toLowerCase();
+    row.style.display = name.includes(input) ? "" : "none";
+  });
+}
   </script>
 </body>
 </html>
