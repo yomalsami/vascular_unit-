@@ -213,8 +213,9 @@ thead {
     }
 
     function backToMenu() {
-      document.getElementById("form-section").classList.add("hidden");
-      document.getElementById("action-section").classList.remove("hidden");
+  document.getElementById("form-section").classList.add("hidden");
+  document.getElementById("browse-section").classList.add("hidden");
+  document.getElementById("action-section").classList.remove("hidden");
     }
 
     function submitPatient() {
@@ -250,10 +251,16 @@ thead {
     });
     }
     function showBrowsePatients() {
+  // Hide all other sections
+  document.getElementById("login-section").classList.add("hidden");
   document.getElementById("action-section").classList.add("hidden");
+  document.getElementById("form-section").classList.add("hidden");
+  
+  // Show browse section
   document.getElementById("browse-section").classList.remove("hidden");
+  
   loadPatients();
-}
+    }
 
 function loadPatients() {
   const tbody = document.getElementById("patientTableBody");
