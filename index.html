@@ -18,12 +18,12 @@
       text-align: center;
     }
     .container {
-  max-width: 800px; /* increased from 600px */
-  margin: 40px auto; /* added vertical space */
-  background: #fff;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      max-width: 800px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
     }
     input, textarea {
       width: 100%;
@@ -69,24 +69,23 @@
       margin-top: 10px;
     }
     table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 15px;
-  margin-top: 20px;
-}
-
-th, td {
-  padding: 12px 8px;
-  border: 1px solid #ccc;
-  text-align: left;
-}
-
-thead {
-  background-color: #e3f2fd;
-}
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 15px;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 12px 8px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+    thead {
+      background-color: #e3f2fd;
+    }
   </style>
 </head>
 <body>
+  <!-- Login Section -->
   <div class="container" id="login-section">
     <h3>Admin Login</h3>
     <input type="email" id="email" placeholder="Admin Email" required />
@@ -96,7 +95,7 @@ thead {
     <p id="login-error" style="color: red;"></p>
   </div>
 
-  <!-- Action Section -->
+  <!-- Action Menu -->
   <div class="container hidden" id="action-section">
     <h3>Welcome!</h3>
     <div class="action-buttons">
@@ -107,72 +106,44 @@ thead {
     <button onclick="logout()">Logout</button>
   </div>
 
-  <!-- Patient Form Section -->
+  <!-- Add Patient Form -->
   <div class="container hidden" id="form-section">
     <h3>Add New Patient</h3>
-
-    <label>Full Name</label>
-    <input type="text" id="name">
-
-    <label>Age</label>
-    <input type="number" id="age">
-
-    <label>Gender</label>
-    <input type="text" id="gender">
-
-    <label>Diagnosis</label>
-    <textarea id="diagnosis"></textarea>
-
-    <label>Interventions</label>
-    <textarea id="interventions"></textarea>
-
-    <label>Date of Visit</label>
-    <input type="date" id="visitDate">
-
-    <label>Hospital Stay (days)</label>
-    <input type="number" id="stay">
-
-    <label>Contact Number</label>
-    <input type="text" id="contact">
-
-    <label>Remarks / Notes</label>
-    <textarea id="notes"></textarea>
-
+    <label>Full Name</label><input type="text" id="name">
+    <label>Age</label><input type="number" id="age">
+    <label>Gender</label><input type="text" id="gender">
+    <label>Diagnosis</label><textarea id="diagnosis"></textarea>
+    <label>Interventions</label><textarea id="interventions"></textarea>
+    <label>Date of Visit</label><input type="date" id="visitDate">
+    <label>Hospital Stay (days)</label><input type="number" id="stay">
+    <label>Contact Number</label><input type="text" id="contact">
+    <label>Remarks / Notes</label><textarea id="notes"></textarea>
+    <label>Planned Surgery</label><input type="text" id="plannedSurgery">
+    <label>Date of Surgery</label><input type="date" id="dateOfSurgery">
+    <label>Surgeon</label><input type="text" id="surgeon">
     <button onclick="submitPatient()">Submit</button>
     <button onclick="backToMenu()">Back</button>
     <p id="submit-message" style="color: green;"></p>
   </div>
-  <!-- Add this section below the form-section in your existing HTML -->
 
-<div class="container hidden" id="browse-section">
-  <h3>Patient List</h3>
-
-  <input type="text" id="searchInput" placeholder="Search by name..." oninput="filterPatients()" />
-
-  <table border="1" width="100%" style="margin-top: 20px; border-collapse: collapse;">
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Age</th>
-      <th>Gender</th>
-      <th>Diagnosis</th>
-      <th>Interventions</th>
-      <th>Date of Visit</th>
-      <th>Hospital Stay (days)</th>
-      <th>Contact</th>
-      <th>Notes</th>
-    </tr>
-  </thead>
-  <tbody id="patientTableBody">
-    <!-- Rows inserted here -->
-  </tbody>
-  </table>
-  
-
-  <br>
-  <button onclick="backToMenu()">Back</button>
-  <button onclick="downloadExcel()">Download Excel</button>
-</div>
+  <!-- Browse Patients Section -->
+  <div class="container hidden" id="browse-section">
+    <h3>Patient List</h3>
+    <input type="text" id="searchInput" placeholder="Search by name..." oninput="filterPatients()" />
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th><th>Age</th><th>Gender</th><th>Diagnosis</th><th>Interventions</th>
+          <th>Visit Date</th><th>Stay</th><th>Contact</th><th>Notes</th>
+          <th>Planned Surgery</th><th>Date of Surgery</th><th>Surgeon</th>
+        </tr>
+      </thead>
+      <tbody id="patientTableBody"></tbody>
+    </table>
+    <br>
+    <button onclick="backToMenu()">Back</button>
+    <button onclick="downloadExcel()">Download Excel</button>
+  </div>
 
   <script>
     const firebaseConfig = {
@@ -180,7 +151,6 @@ thead {
       authDomain: "vascular-unit-track.firebaseapp.com",
       projectId: "vascular-unit-track",
     };
-
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
@@ -204,132 +174,104 @@ thead {
 
     function logout() {
       auth.signOut().then(() => {
+        document.getElementById("login-section").classList.remove("hidden");
         document.getElementById("action-section").classList.add("hidden");
         document.getElementById("form-section").classList.add("hidden");
-        document.getElementById("login-section").classList.remove("hidden");
+        document.getElementById("browse-section").classList.add("hidden");
       });
     }
 
     function showAddPatient() {
-      document.getElementById("action-section").classList.add("hidden");
       document.getElementById("form-section").classList.remove("hidden");
+      document.getElementById("action-section").classList.add("hidden");
     }
 
     function backToMenu() {
-  document.getElementById("form-section").classList.add("hidden");
-  document.getElementById("browse-section").classList.add("hidden");
-  document.getElementById("action-section").classList.remove("hidden");
+      document.getElementById("form-section").classList.add("hidden");
+      document.getElementById("browse-section").classList.add("hidden");
+      document.getElementById("action-section").classList.remove("hidden");
     }
 
     function submitPatient() {
-  const data = {
-    name: document.getElementById("name").value,
-    age: parseInt(document.getElementById("age").value),
-    gender: document.getElementById("gender").value,
-    diagnosis: document.getElementById("diagnosis").value,
-    interventions: document.getElementById("interventions").value,
-    visitDate: document.getElementById("visitDate").value,
-    stay: parseInt(document.getElementById("stay").value),
-    contact: document.getElementById("contact").value,
-    notes: document.getElementById("notes").value,
-    timestamp: new Date()
-  };
-
-  db.collection("patients").add(data)
-    .then(() => {
-      document.getElementById("submit-message").innerText = "Patient added successfully!";
-      // Clear form fields
-      document.getElementById("name").value = "";
-      document.getElementById("age").value = "";
-      document.getElementById("gender").value = "";
-      document.getElementById("diagnosis").value = "";
-      document.getElementById("interventions").value = "";
-      document.getElementById("visitDate").value = "";
-      document.getElementById("stay").value = "";
-      document.getElementById("contact").value = "";
-      document.getElementById("notes").value = "";
-    })
-    .catch(err => {
-      document.getElementById("submit-message").innerText = err.message;
-    });
+      const data = {
+        name: document.getElementById("name").value,
+        age: parseInt(document.getElementById("age").value),
+        gender: document.getElementById("gender").value,
+        diagnosis: document.getElementById("diagnosis").value,
+        interventions: document.getElementById("interventions").value,
+        visitDate: document.getElementById("visitDate").value,
+        stay: parseInt(document.getElementById("stay").value),
+        contact: document.getElementById("contact").value,
+        notes: document.getElementById("notes").value,
+        plannedSurgery: document.getElementById("plannedSurgery").value,
+        dateOfSurgery: document.getElementById("dateOfSurgery").value,
+        surgeon: document.getElementById("surgeon").value,
+        timestamp: new Date()
+      };
+      db.collection("patients").add(data)
+        .then(() => {
+          document.getElementById("submit-message").innerText = "Patient added successfully!";
+          document.querySelectorAll("#form-section input, #form-section textarea").forEach(el => el.value = "");
+        })
+        .catch(err => {
+          document.getElementById("submit-message").innerText = err.message;
+        });
     }
+
     function showBrowsePatients() {
-  // Hide all other sections
-  document.getElementById("login-section").classList.add("hidden");
-  document.getElementById("action-section").classList.add("hidden");
-  document.getElementById("form-section").classList.add("hidden");
-  
-  // Show browse section
-  document.getElementById("browse-section").classList.remove("hidden");
-  
-  loadPatients();
+      document.getElementById("browse-section").classList.remove("hidden");
+      document.getElementById("action-section").classList.add("hidden");
+      loadPatients();
     }
 
-function loadPatients() {
-  const tbody = document.getElementById("patientTableBody");
-  tbody.innerHTML = "<tr><td colspan='9'>Loading...</td></tr>";
-
-  db.collection("patients").orderBy("timestamp", "desc").get()
-    .then(snapshot => {
-      let rows = "";
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        rows += `
-          <tr>
-            <td>${data.name || ""}</td>
-            <td>${data.age || ""}</td>
-            <td>${data.gender || ""}</td>
-            <td>${data.diagnosis || ""}</td>
-            <td>${data.interventions || ""}</td>
-            <td>${data.visitDate || ""}</td>
-            <td>${data.stay || ""}</td>
-            <td>${data.contact || ""}</td>
-            <td>${data.notes || ""}</td>
-          </tr>
-        `;
+    function loadPatients() {
+      const tbody = document.getElementById("patientTableBody");
+      tbody.innerHTML = "<tr><td colspan='12'>Loading...</td></tr>";
+      db.collection("patients").orderBy("timestamp", "desc").get().then(snapshot => {
+        let rows = "";
+        snapshot.forEach(doc => {
+          const d = doc.data();
+          rows += `
+            <tr>
+              <td>${d.name || ""}</td><td>${d.age || ""}</td><td>${d.gender || ""}</td>
+              <td>${d.diagnosis || ""}</td><td>${d.interventions || ""}</td><td>${d.visitDate || ""}</td>
+              <td>${d.stay || ""}</td><td>${d.contact || ""}</td><td>${d.notes || ""}</td>
+              <td>${d.plannedSurgery || ""}</td><td>${d.dateOfSurgery || ""}</td><td>${d.surgeon || ""}</td>
+            </tr>`;
+        });
+        tbody.innerHTML = rows || "<tr><td colspan='12'>No patients found.</td></tr>";
       });
-      tbody.innerHTML = rows || "<tr><td colspan='9'>No patients found.</td></tr>";
-    });
-}
+    }
 
-function filterPatients() {
-  const input = document.getElementById("searchInput").value.toLowerCase();
-  const rows = document.querySelectorAll("#patientTableBody tr");
-  rows.forEach(row => {
-    const name = row.cells[0].innerText.toLowerCase();
-    row.style.display = name.includes(input) ? "" : "none";
-  });
-}
+    function filterPatients() {
+      const input = document.getElementById("searchInput").value.toLowerCase();
+      document.querySelectorAll("#patientTableBody tr").forEach(row => {
+        const name = row.cells[0].innerText.toLowerCase();
+        row.style.display = name.includes(input) ? "" : "none";
+      });
+    }
+
     function downloadExcel() {
-  const rows = document.querySelectorAll("#patientTableBody tr");
-
-  // Extract header
-  const headers = [
-    "Name", "Age", "Gender", "Diagnosis", "Interventions",
-    "Date of Visit", "Hospital Stay", "Contact", "Notes"
-  ];
-
-  // Extract data
-  const data = [headers];
-  rows.forEach(row => {
-    const cols = row.querySelectorAll("td");
-    const rowData = Array.from(cols).map(col => col.innerText);
-    data.push(rowData);
-  });
-
-  // Create worksheet and workbook
-  const ws = XLSX.utils.aoa_to_sheet(data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Patients");
-
-  // Trigger download
-  XLSX.writeFile(wb, "patients.xlsx");
+      const headers = [
+        "Name", "Age", "Gender", "Diagnosis", "Interventions", "Visit Date", "Stay",
+        "Contact", "Notes", "Planned Surgery", "Date of Surgery", "Surgeon"
+      ];
+      const rows = [headers];
+      document.querySelectorAll("#patientTableBody tr").forEach(row => {
+        const data = Array.from(row.querySelectorAll("td")).map(td => td.innerText);
+        rows.push(data);
+      });
+      const ws = XLSX.utils.aoa_to_sheet(rows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Patients");
+      XLSX.writeFile(wb, "patients.xlsx");
     }
   </script>
+
   <footer style="text-align: center; margin-top: 60px; color: #777; font-size: 14px;">
-  Made by <a href="https://dryomal.com" target="_blank" style="color: #1976d2; text-decoration: none;">
-    Dr. Yomal Amarathunge ⚕️
-  </a>
+    Made by <a href="https://dryomal.com" target="_blank" style="color: #1976d2; text-decoration: none;">
+      Dr. Yomal Amarathunge ⚕️
+    </a>
   </footer>
 </body>
 </html>
