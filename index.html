@@ -98,6 +98,10 @@
   <!-- Action Menu -->
   <div class="container hidden" id="action-section">
     <h3>Welcome!</h3>
+<div id="pendingSurgeries" style="background: #fff3e0; border-left: 6px solid #ff9800; padding: 16px; margin-bottom: 20px; border-radius: 8px;">
+  <h4>Upcoming Surgeries</h4>
+  <ul id="surgeryList" style="padding-left: 20px; margin: 0;"></ul>
+</div>
     <div class="action-buttons">
       <div class="big-btn" onclick="showAddPatient()">Add Patient</div>
       <div class="big-btn" onclick="showBrowsePatients()">Browse Patients</div>
@@ -130,6 +134,7 @@
   <div class="container hidden" id="browse-section">
     <h3>Patient List</h3>
     <input type="text" id="searchInput" placeholder="Search by name..." oninput="filterPatients()" />
+    <div style="overflow-x: auto; max-width: 100%;">
     <table>
       <thead>
         <tr>
@@ -140,6 +145,7 @@
       </thead>
       <tbody id="patientTableBody"></tbody>
     </table>
+      </div>
     <br>
     <button onclick="backToMenu()">Back</button>
     <button onclick="downloadExcel()">Download Excel</button>
@@ -170,6 +176,7 @@
         .finally(() => {
           document.getElementById("login-loading").style.display = "none";
         });
+      loadPendingSurgeries();
     }
 
     function logout() {
@@ -265,6 +272,29 @@
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "Patients");
       XLSX.writeFile(wb, "patients.xlsx");
+    }function loadPendingSurgeries() {
+  const surgeryList = document.getElementById("surgeryList");
+  surgeryList.innerHTML = "<li>Loading...</li>";
+
+  const today = new Date().toISOString().split("T")[0];
+
+  db.collection("patients")
+    .where("dateOfSurgery", ">=", today)
+    .orderBy("dateOfSurgery")
+    .limit(10)
+    .get()
+    .then(snapshot => {
+      let items = "";
+      snapshot.forEach(doc => {
+        const d = doc.data();
+        items += `<li><strong>${d.name}</strong> - ${d.dateOfSurgery} (${d.plannedSurgery || "N/A"})</li>`;
+      });
+      surgeryList.innerHTML = items || "<li>No upcoming surgeries</li>";
+    })
+    .catch(err => {
+      surgeryList.innerHTML = "<li>Error loading surgeries</li>";
+      console.error(err);
+    });
     }
   </script>
 
