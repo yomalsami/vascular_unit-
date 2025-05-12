@@ -13,17 +13,30 @@
       margin: 0;
       padding: 40px;
       background-color: #f4f6f8;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
     }
     h2, h3 {
       text-align: center;
     }
     .container {
-      max-width: 800px;
-      margin: 40px auto;
       background: #fff;
-      padding: 30px;
+      padding: 20px;
       border-radius: 12px;
       box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    .flex-container {
+      display: grid;
+      grid-template-columns: 1fr 2fr 1fr;
+      gap: 20px;
+      width: 100%;
+    }
+    .left-panel, .right-panel, .center-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
     input, textarea {
       width: 100%;
@@ -45,22 +58,14 @@
     button:hover {
       background-color: #125ea3;
     }
-    .hidden {
-      display: none;
-    }
-    .action-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 40px;
-      margin-top: 40px;
-    }
     .big-btn {
       background-color: #2196f3;
-      padding: 40px 20px;
+      padding: 20px;
       font-size: 18px;
       border-radius: 12px;
       text-align: center;
-      width: 200px;
+      width: 100%;
+      cursor: pointer;
     }
     .loading {
       text-align: center;
@@ -72,7 +77,6 @@
       width: 100%;
       border-collapse: collapse;
       font-size: 15px;
-      margin-top: 20px;
     }
     th, td {
       padding: 12px 8px;
@@ -82,26 +86,60 @@
     thead {
       background-color: #e3f2fd;
     }
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 40px;
+    }
+    .hidden {
+      display: none;
+    }
+    footer {
+      text-align: center;
+      margin-top: 60px;
+      color: #777;
+      font-size: 14px;
+    }
+    .pending-surgeries {
+      background: #fff3e0;
+      border-left: 6px solid #ff9800;
+      padding: 16px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+    }
   </style>
 </head>
 <body>
-  <!-- Login Section -->
-  <div class="container" id="login-section">
-    <h3>Admin Login</h3>
-    <input type="email" id="email" placeholder="Admin Email" required />
-    <input type="password" id="password" placeholder="Password" required />
-    <button onclick="login()">Login</button>
-    <p class="loading" id="login-loading" style="display:none;">Logging in...</p>
-    <p id="login-error" style="color: red;"></p>
+  <div class="flex-container">
+    <!-- Left Panel -->
+    <div class="left-panel">
+      <div class="container big-btn" onclick="showAddPatient()">Add Patient</div>
+      <div class="container big-btn" onclick="showBrowsePatients()">Browse Patients</div>
+      <div class="container big-btn" onclick="showSurgeryData()">Surgery Data</div>
+    </div>
+
+    <!-- Center Panel (Clinic Details) -->
+    <div class="center-panel">
+      <div class="container">
+        <h3>Clinic Details</h3>
+        <p>Provide details about the clinic, services, and any relevant information for visitors.</p>
+        <!-- You can add more clinic details here -->
+      </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="right-panel">
+      <div class="container pending-surgeries">
+        <h4>Pending Surgeries</h4>
+        <ul id="surgeryList"></ul>
+      </div>
+    </div>
   </div>
 
   <!-- Action Menu -->
   <div class="container hidden" id="action-section">
     <h3>Welcome!</h3>
-<div id="pendingSurgeries" style="background: #fff3e0; border-left: 6px solid #ff9800; padding: 16px; margin-bottom: 20px; border-radius: 8px;">
-  <h4>Upcoming Surgeries</h4>
-  <ul id="surgeryList" style="padding-left: 20px; margin: 0;"></ul>
-</div>
     <div class="action-buttons">
       <div class="big-btn" onclick="showAddPatient()">Add Patient</div>
       <div class="big-btn" onclick="showBrowsePatients()">Browse Patients</div>
@@ -151,7 +189,14 @@
     <button onclick="downloadExcel()">Download Excel</button>
   </div>
 
-  <script>
+  <footer>
+    Made by <a href="https://dryomal.com" target="_blank" style="color: #1976d2; text-decoration: none;">
+      Dr. Yomal Amarathunge ⚕️
+    </a>
+  </footer>
+
+
+<script>
     const firebaseConfig = {
       apiKey: "AIzaSyDNL5qz7CRfGG7KErrvZACMupDu5CBjXHY",
       authDomain: "vascular-unit-track.firebaseapp.com",
