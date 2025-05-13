@@ -143,6 +143,7 @@
   <!-- Add Patient Form -->
   <div class="container hidden" id="form-section">
     <h3>Add New Patient</h3>
+    <input type="hidden" id="patientId">
     <label>Full Name</label><input type="text" id="name">
     <label>Age</label><input type="number" id="age">
     <label>Gender</label><input type="text" id="gender">
@@ -242,21 +243,36 @@
   }
 
   function submitPatient() {
-    const data = {
-      name: document.getElementById("name").value,
-      age: parseInt(document.getElementById("age").value),
-      gender: document.getElementById("gender").value,
-      diagnosis: document.getElementById("diagnosis").value,
-      interventions: document.getElementById("interventions").value,
-      visitDate: document.getElementById("visitDate").value,
-      stay: parseInt(document.getElementById("stay").value),
-      contact: document.getElementById("contact").value,
-      notes: document.getElementById("notes").value,
-      plannedSurgery: document.getElementById("plannedSurgery").value,
-      dateOfSurgery: document.getElementById("dateOfSurgery").value,
-      surgeon: document.getElementById("surgeon").value,
-      timestamp: new Date()
-    };
+  const id = document.getElementById("patientId").value;
+  const data = {
+    name: document.getElementById("name").value,
+    age: parseInt(document.getElementById("age").value),
+    gender: document.getElementById("gender").value,
+    diagnosis: document.getElementById("diagnosis").value,
+    interventions: document.getElementById("interventions").value,
+    visitDate: document.getElementById("visitDate").value,
+    stay: parseInt(document.getElementById("stay").value),
+    contact: document.getElementById("contact").value,
+    notes: document.getElementById("notes").value,
+    plannedSurgery: document.getElementById("plannedSurgery").value,
+    dateOfSurgery: document.getElementById("dateOfSurgery").value,
+    surgeon: document.getElementById("surgeon").value,
+    timestamp: new Date()
+  };
+
+  if (id) {
+    // Update existing patient
+    db.collection("patients").doc(id).update(data)
+      .then(() => {
+        document.getElementById("submit-message").innerText = "Patient updated successfully!";
+        document.getElementById("patientId").value = "";
+        document.querySelectorAll("#form-section input, #form-section textarea").forEach(el => el.value = "");
+      })
+      .catch(err => {
+        document.getElementById("submit-message").innerText = err.message;
+      });
+  } else {
+    // Add new patient
     db.collection("patients").add(data)
       .then(() => {
         document.getElementById("submit-message").innerText = "Patient added successfully!";
@@ -266,24 +282,46 @@
         document.getElementById("submit-message").innerText = err.message;
       });
   }
+  }
 
   function loadPatients() {
-    const tbody = document.getElementById("patientTableBody");
-    tbody.innerHTML = "<tr><td colspan='12'>Loading...</td></tr>";
-    db.collection("patients").orderBy("timestamp", "desc").get().then(snapshot => {
-      let rows = "";
-      snapshot.forEach(doc => {
-        const d = doc.data();
-        rows += `
-          <tr>
-            <td>${d.name || ""}</td><td>${d.age || ""}</td><td>${d.gender || ""}</td>
-            <td>${d.diagnosis || ""}</td><td>${d.interventions || ""}</td><td>${d.visitDate || ""}</td>
-            <td>${d.stay || ""}</td><td>${d.contact || ""}</td><td>${d.notes || ""}</td>
-            <td>${d.plannedSurgery || ""}</td><td>${d.dateOfSurgery || ""}</td><td>${d.surgeon || ""}</td>
-          </tr>`;
-      });
-      tbody.innerHTML = rows || "<tr><td colspan='12'>No patients found.</td></tr>";
+  const tbody = document.getElementById("patientTableBody");
+  tbody.innerHTML = "<tr><td colspan='13'>Loading...</td></tr>";
+  db.collection("patients").orderBy("timestamp", "desc").get().then(snapshot => {
+    let rows = "";
+    snapshot.forEach(doc => {
+      const d = doc.data();
+      rows += `
+        <tr>
+          <td>${d.name || ""}</td><td>${d.age || ""}</td><td>${d.gender || ""}</td>
+          <td>${d.diagnosis || ""}</td><td>${d.interventions || ""}</td><td>${d.visitDate || ""}</td>
+          <td>${d.stay || ""}</td><td>${d.contact || ""}</td><td>${d.notes || ""}</td>
+          <td>${d.plannedSurgery || ""}</td><td>${d.dateOfSurgery || ""}</td><td>${d.surgeon || ""}</td>
+          <td><button onclick="editPatient('${doc.id}')">Edit</button></td>
+        </tr>`;
     });
+    tbody.innerHTML = rows || "<tr><td colspan='13'>No patients found.</td></tr>";
+  });
+}
+  function editPatient(id) {
+  db.collection("patients").doc(id).get().then(doc => {
+    const d = doc.data();
+    document.getElementById("patientId").value = id;
+    document.getElementById("name").value = d.name || "";
+    document.getElementById("age").value = d.age || "";
+    document.getElementById("gender").value = d.gender || "";
+    document.getElementById("diagnosis").value = d.diagnosis || "";
+    document.getElementById("interventions").value = d.interventions || "";
+    document.getElementById("visitDate").value = d.visitDate || "";
+    document.getElementById("stay").value = d.stay || "";
+    document.getElementById("contact").value = d.contact || "";
+    document.getElementById("notes").value = d.notes || "";
+    document.getElementById("plannedSurgery").value = d.plannedSurgery || "";
+    document.getElementById("dateOfSurgery").value = d.dateOfSurgery || "";
+    document.getElementById("surgeon").value = d.surgeon || "";
+
+    showAddPatient(); // Switch to form view
+  });
   }
 
   function filterPatients() {
