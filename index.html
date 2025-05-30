@@ -11,7 +11,7 @@
     body {
       font-family: 'Segoe UI', sans-serif;
       margin: 0;
-      padding: 40px;
+      padding: 20px;
       background-color: #f4f6f8;
     }
     h2, h3 {
@@ -25,16 +25,13 @@
       margin-bottom: 20px;
     }
     .flex-container {
-      display: grid;
-      grid-template-columns: 250px 1fr 300px;
+      display: flex;
       gap: 20px;
       width: 100%;
     }
     .left-panel {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      min-width: 250px;
+      width: 250px;
+      flex-shrink: 0;
     }
     .center-panel {
       flex: 1;
@@ -42,6 +39,7 @@
     }
     .right-panel {
       width: 300px;
+      flex-shrink: 0;
     }
     input, textarea {
       width: 100%;
@@ -72,6 +70,7 @@
       width: 100%;
       cursor: pointer;
       white-space: nowrap;
+      margin-bottom: 15px;
     }
     .loading {
       text-align: center;
@@ -108,11 +107,12 @@
       margin-bottom: 20px;
       border-radius: 8px;
     }
+    .center-content {
+      max-width: 100%;
+      overflow: hidden;
+    }
 
     @media (max-width: 1200px) {
-      .flex-container {
-        grid-template-columns: 220px 1fr 250px;
-      }
       .right-panel {
         width: 250px;
       }
@@ -120,15 +120,33 @@
 
     @media (max-width: 992px) {
       .flex-container {
-        grid-template-columns: 1fr;
+        flex-direction: column;
       }
       .left-panel, .center-panel, .right-panel {
         width: 100%;
       }
+      .left-panel {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+      .left-panel .container {
+        flex: 1;
+        min-width: 200px;
+      }
     }
 
-    .center-panel .container {
-      overflow: hidden;
+    @media (max-width: 576px) {
+      body {
+        padding: 10px;
+      }
+      .container {
+        padding: 15px;
+      }
+      .big-btn {
+        padding: 15px 10px;
+        font-size: 16px;
+      }
     }
   </style>
 </head>
@@ -156,7 +174,7 @@
 
     <!-- Center Panel -->
     <div class="center-panel">
-      <div class="container">
+      <div class="container center-content">
         <h3>Clinic Details</h3>
         <p>Provide details about the clinic, services, and any relevant information for visitors.</p>
       </div>
@@ -171,6 +189,7 @@
     </div>
   </div>
 
+  <!-- Rest of your HTML remains the same -->
   <!-- Add Patient Form -->
   <div class="container hidden" id="form-section">
     <h3>Add New Patient</h3>
@@ -220,6 +239,7 @@
   </footer>
 
 <script>
+  // Your JavaScript remains exactly the same
   const firebaseConfig = {
     apiKey: "AIzaSyDNL5qz7CRfGG7KErrvZACMupDu5CBjXHY",
     authDomain: "vascular-unit-track.firebaseapp.com",
