@@ -14,8 +14,9 @@
       padding: 20px;
       background-color: #f4f6f8;
     }
-    h2, h3 {
+    h2, h3, h4 {
       text-align: center;
+      margin-top: 0;
     }
     .container {
       background: #fff;
@@ -26,18 +27,24 @@
     }
     .dashboard {
       display: flex;
-      gap: 20px;
+      gap: 30px;
       width: 100%;
     }
     .left-panel {
-      width: 250px;
+      width: 280px;
       flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
     .right-panel {
-      width: 300px;
+      width: 320px;
       flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
-    input, textarea {
+    input, textarea, select {
       width: 100%;
       padding: 10px;
       margin-top: 6px;
@@ -48,17 +55,18 @@
     button {
       padding: 12px 24px;
       border: none;
-      background-color: #800000; /* Maroon color */
+      background-color: #800000;
       color: white;
       border-radius: 8px;
       cursor: pointer;
       margin-right: 10px;
+      transition: background-color 0.3s;
     }
     button:hover {
-      background-color: #600000; /* Darker maroon on hover */
+      background-color: #600000;
     }
     .nav-btn {
-      background-color: #800000; /* Maroon color */
+      background-color: #800000;
       padding: 20px 15px;
       font-size: 18px;
       border-radius: 12px;
@@ -66,7 +74,6 @@
       width: 100%;
       cursor: pointer;
       white-space: nowrap;
-      margin-bottom: 15px;
       color: white;
     }
     .loading {
@@ -100,9 +107,9 @@
     .pending-surgeries {
       background: #fff3e0;
       border-left: 6px solid #ff9800;
-      padding: 16px;
-      margin-bottom: 20px;
+      padding: 20px;
       border-radius: 8px;
+      margin-bottom: 0;
     }
     .form-container {
       max-width: 800px;
@@ -112,24 +119,45 @@
       background-color: #757575;
       margin-top: 20px;
     }
+    .checkbox-group {
+      margin: 15px 0;
+    }
+    .checkbox-option {
+      margin: 8px 0;
+      display: flex;
+      align-items: center;
+    }
+    .checkbox-option input {
+      width: auto;
+      margin-right: 10px;
+      margin-bottom: 0;
+    }
+    .form-section {
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #eee;
+    }
+    .form-section:last-child {
+      border-bottom: none;
+    }
 
     @media (max-width: 1200px) {
       .right-panel {
-        width: 250px;
+        width: 280px;
       }
     }
 
     @media (max-width: 992px) {
       .dashboard {
         flex-direction: column;
+        gap: 20px;
       }
       .left-panel, .right-panel {
         width: 100%;
       }
       .left-panel {
-        display: flex;
+        flex-direction: row;
         flex-wrap: wrap;
-        gap: 15px;
       }
       .left-panel .container {
         flex: 1;
@@ -139,7 +167,7 @@
 
     @media (max-width: 576px) {
       body {
-        padding: 10px;
+        padding: 15px;
       }
       .container {
         padding: 15px;
@@ -147,6 +175,9 @@
       .nav-btn {
         padding: 15px 10px;
         font-size: 16px;
+      }
+      .left-panel {
+        flex-direction: column;
       }
     }
   </style>
@@ -170,7 +201,7 @@
       <div class="left-panel">
         <div class="container nav-btn" onclick="showAddPatient()">Add Patient</div>
         <div class="container nav-btn" onclick="showBrowsePatients()">Browse Patients</div>
-        <div class="container nav-btn" onclick="showSurgeryData()">Surgery Data</div>
+        <div class="container nav-btn" onclick="showSurgeryDataForm()">Surgery Data</div>
         <div class="container"><button onclick="logout()">Logout</button></div>
       </div>
 
@@ -226,6 +257,161 @@
     <button class="back-btn" onclick="backToDashboard()">Back to Dashboard</button>
   </div>
 
+  <!-- Surgery Data Form -->
+  <div class="container hidden form-container" id="surgery-data-section">
+    <h3>Surgery Data Collection</h3>
+    
+    <div class="form-section">
+      <h4>Patient Information</h4>
+      <label>Name</label>
+      <input type="text" id="surgery-name">
+      
+      <label>Age</label>
+      <input type="number" id="surgery-age">
+      
+      <label>Sex</label>
+      <select id="surgery-sex">
+        <option value="">Select</option>
+        <option value="M">Male</option>
+        <option value="F">Female</option>
+      </select>
+      
+      <label>Telephone Number</label>
+      <input type="text" id="surgery-phone">
+      
+      <label>Clinical History Before Surgery</label>
+      <textarea id="surgery-history"></textarea>
+    </div>
+    
+    <div class="form-section">
+      <h4>Surgical Details</h4>
+      <label>Affected Limb</label>
+      <select id="surgery-limb">
+        <option value="">Select</option>
+        <option value="R">Right</option>
+        <option value="L">Left</option>
+      </select>
+      
+      <label>CTA</label>
+      <input type="text" id="surgery-cta">
+      
+      <label>Angioplasty Segments</label>
+      <div class="checkbox-group">
+        <div class="checkbox-option"><input type="checkbox" id="sfa" value="SFA"> <label for="sfa">SFA</label></div>
+        <div class="checkbox-option"><input type="checkbox" id="popliteal" value="Popliteal"> <label for="popliteal">Popliteal</label></div>
+        <div class="checkbox-option"><input type="checkbox" id="pta" value="PTA"> <label for="pta">PTA</label></div>
+        <div class="checkbox-option"><input type="checkbox" id="ata" value="ATA"> <label for="ata">ATA</label></div>
+        <div class="checkbox-option"><input type="checkbox" id="tpt" value="TPT"> <label for="tpt">TPT</label></div>
+        <div class="checkbox-option"><input type="checkbox" id="peroneal" value="Peroneal"> <label for="peroneal">Peroneal</label></div>
+      </div>
+      
+      <label>Angioplasty Date</label>
+      <input type="date" id="surgery-date">
+      
+      <label>Radiological Success</label>
+      <input type="text" id="surgery-success">
+    </div>
+    
+    <div class="form-section">
+      <h4>Post-Surgical Outcomes</h4>
+      <label>Post Surgery Amputation</label>
+      <select id="surgery-amputation">
+        <option value="">Select</option>
+        <option value="Y">Yes</option>
+        <option value="N">No</option>
+      </select>
+      
+      <div id="amputation-type-container" class="hidden">
+        <label>Amputation Type</label>
+        <select id="surgery-amputation-type">
+          <option value="">Select</option>
+          <option value="Toe">Toe</option>
+          <option value="Forefoot">Forefoot</option>
+          <option value="BKA">Below Knee Amputation (BKA)</option>
+          <option value="AKA">Above Knee Amputation (AKA)</option>
+        </select>
+      </div>
+      
+      <label>Amputation Free Period</label>
+      <select id="surgery-amputation-free">
+        <option value="">Select</option>
+        <option value="<30">Less than 30 days</option>
+        <option value="1year">1 year</option>
+        <option value="5years">5 years</option>
+      </select>
+      
+      <label>Was the wound/ulcer healed following angioplasty?</label>
+      <div class="checkbox-group">
+        <div class="checkbox-option"><input type="radio" name="wound-healed" id="wound-yes" value="Y"> <label for="wound-yes">Yes</label></div>
+        <div class="checkbox-option"><input type="radio" name="wound-healed" id="wound-no" value="N"> <label for="wound-no">No</label></div>
+      </div>
+      
+      <div id="healing-time-container" class="hidden">
+        <label>Time to healing (months)</label>
+        <input type="number" id="healing-time">
+      </div>
+    </div>
+    
+    <div class="form-section">
+      <h4>Post-Procedure Details</h4>
+      <label>Did you require any of the following after angioplasty?</label>
+      <div class="checkbox-group">
+        <div class="checkbox-option"><input type="checkbox" id="minor-amp" value="Minor amputation"> <label for="minor-amp">Minor amputation (e.g., toe)</label></div>
+        <div class="checkbox-option"><input type="checkbox" id="major-amp" value="Major amputation"> <label for="major-amp">Major amputation (below or above knee)</label></div>
+        <div class="checkbox-option"><input type="checkbox" id="bypass" value="Bypass surgery"> <label for="bypass">Bypass surgery</label></div>
+        <div class="checkbox-option"><input type="checkbox" id="reintervention" value="Re-intervention"> <label for="reintervention">Re-intervention (repeat angioplasty or stent)</label></div>
+      </div>
+      
+      <label>Were you mobile after the procedure?</label>
+      <div class="checkbox-group">
+        <div class="checkbox-option"><input type="radio" name="post-mobility" id="mobile-independent" value="Independently"> <label for="mobile-independent">Independently</label></div>
+        <div class="checkbox-option"><input type="radio" name="post-mobility" id="mobile-aid" value="With walking aid"> <label for="mobile-aid">With walking aid</label></div>
+        <div class="checkbox-option"><input type="radio" name="post-mobility" id="mobile-wheelchair" value="Wheelchair-bound"> <label for="mobile-wheelchair">Wheelchair-bound</label></div>
+        <div class="checkbox-option"><input type="radio" name="post-mobility" id="mobile-bedridden" value="Bedridden"> <label for="mobile-bedridden">Bedridden</label></div>
+      </div>
+      
+      <label>Current mobility status:</label>
+      <div class="checkbox-group">
+        <div class="checkbox-option"><input type="radio" name="current-mobility" id="mobility-full" value="Fully mobile"> <label for="mobility-full">Fully mobile</label></div>
+        <div class="checkbox-option"><input type="radio" name="current-mobility" id="mobility-partial" value="Partially mobile"> <label for="mobility-partial">Partially mobile</label></div>
+        <div class="checkbox-option"><input type="radio" name="current-mobility" id="mobility-dependent" value="Dependent for ADLs"> <label for="mobility-dependent">Dependent for activities of daily living (ADLs)</label></div>
+      </div>
+      
+      <label>Do you wear offloading footwear as advised?</label>
+      <div class="checkbox-group">
+        <div class="checkbox-option"><input type="radio" name="footwear" id="footwear-yes" value="Yes always"> <label for="footwear-yes">Yes always</label></div>
+        <div class="checkbox-option"><input type="radio" name="footwear" id="footwear-sometimes" value="Sometimes"> <label for="footwear-sometimes">Sometimes</label></div>
+        <div class="checkbox-option"><input type="radio" name="footwear" id="footwear-no" value="No"> <label for="footwear-no">No</label></div>
+      </div>
+    </div>
+    
+    <div class="form-section">
+      <h4>Follow-up Information</h4>
+      <label>Have you experienced:</label>
+      <div class="checkbox-group">
+        <div class="checkbox-option"><input type="checkbox" id="new-ulcers" value="New ulcers"> <label for="new-ulcers">New ulcers</label></div>
+        <div class="checkbox-option"><input type="checkbox" id="pain-rest" value="Pain at rest"> <label for="pain-rest">Pain at rest</label></div>
+        <div class="checkbox-option"><input type="checkbox" id="hospital-admit" value="Hospital admission"> <label for="hospital-admit">Any hospital admission after angioplasty?</label></div>
+      </div>
+      
+      <label>On a scale of 1–10, how would you rate your quality of life now? (1 = worst, 10 = best)</label>
+      <input type="number" id="qol-score" min="1" max="10">
+      
+      <label>How satisfied are you with the outcome of the angioplasty?</label>
+      <div class="checkbox-group">
+        <div class="checkbox-option"><input type="radio" name="satisfaction" id="satisfaction-vs" value="Very satisfied"> <label for="satisfaction-vs">Very satisfied</label></div>
+        <div class="checkbox-option"><input type="radio" name="satisfaction" id="satisfaction-s" value="Satisfied"> <label for="satisfaction-s">Satisfied</label></div>
+        <div class="checkbox-option"><input type="radio" name="satisfaction" id="satisfaction-n" value="Neutral"> <label for="satisfaction-n">Neutral</label></div>
+        <div class="checkbox-option"><input type="radio" name="satisfaction" id="satisfaction-d" value="Dissatisfied"> <label for="satisfaction-d">Dissatisfied</label></div>
+        <div class="checkbox-option"><input type="radio" name="satisfaction" id="satisfaction-vd" value="Very dissatisfied"> <label for="satisfaction-vd">Very dissatisfied</label></div>
+      </div>
+    </div>
+    
+    <button onclick="submitSurgeryData()">Submit Surgery Data</button>
+    <button class="back-btn" onclick="backToDashboard()">Back to Dashboard</button>
+    <p id="surgery-submit-message" style="color: green;"></p>
+  </div>
+
   <footer>
     Made by <a href="https://dryomal.com" target="_blank" style="color: #1976d2; text-decoration: none;">
       Dr. Yomal Amarathunge ⚕️
@@ -241,6 +427,18 @@
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
   const db = firebase.firestore();
+
+  // Show amputation type field only if amputation is Yes
+  document.getElementById('surgery-amputation').addEventListener('change', function() {
+    document.getElementById('amputation-type-container').classList.toggle('hidden', this.value !== 'Y');
+  });
+
+  // Show healing time field only if wound healed is Yes
+  document.querySelectorAll('input[name="wound-healed"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+      document.getElementById('healing-time-container').classList.toggle('hidden', this.value !== 'Y');
+    });
+  });
 
   auth.onAuthStateChanged(user => {
     if (user) {
@@ -273,19 +471,29 @@
   function showAddPatient() {
     document.getElementById("dashboard-section").classList.add("hidden");
     document.getElementById("browse-section").classList.add("hidden");
+    document.getElementById("surgery-data-section").classList.add("hidden");
     document.getElementById("form-section").classList.remove("hidden");
   }
 
   function showBrowsePatients() {
     document.getElementById("dashboard-section").classList.add("hidden");
     document.getElementById("form-section").classList.add("hidden");
+    document.getElementById("surgery-data-section").classList.add("hidden");
     document.getElementById("browse-section").classList.remove("hidden");
     loadPatients();
+  }
+
+  function showSurgeryDataForm() {
+    document.getElementById("dashboard-section").classList.add("hidden");
+    document.getElementById("form-section").classList.add("hidden");
+    document.getElementById("browse-section").classList.add("hidden");
+    document.getElementById("surgery-data-section").classList.remove("hidden");
   }
 
   function backToDashboard() {
     document.getElementById("form-section").classList.add("hidden");
     document.getElementById("browse-section").classList.add("hidden");
+    document.getElementById("surgery-data-section").classList.add("hidden");
     document.getElementById("dashboard-section").classList.remove("hidden");
   }
 
@@ -308,7 +516,6 @@
     };
 
     if (id) {
-      // Update existing patient
       db.collection("patients").doc(id).update(data)
         .then(() => {
           document.getElementById("submit-message").innerText = "Patient updated successfully!";
@@ -319,7 +526,6 @@
           document.getElementById("submit-message").innerText = err.message;
         });
     } else {
-      // Add new patient
       db.collection("patients").add(data)
         .then(() => {
           document.getElementById("submit-message").innerText = "Patient added successfully!";
@@ -329,6 +535,57 @@
           document.getElementById("submit-message").innerText = err.message;
         });
     }
+  }
+
+  function submitSurgeryData() {
+    // Get all selected angioplasty segments
+    const segments = [];
+    document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked').forEach(checkbox => {
+      if (checkbox.id !== 'new-ulcers' && checkbox.id !== 'pain-rest' && checkbox.id !== 'hospital-admit') {
+        segments.push(checkbox.value);
+      }
+    });
+
+    const data = {
+      name: document.getElementById("surgery-name").value,
+      age: parseInt(document.getElementById("surgery-age").value),
+      sex: document.getElementById("surgery-sex").value,
+      phone: document.getElementById("surgery-phone").value,
+      clinicalHistory: document.getElementById("surgery-history").value,
+      affectedLimb: document.getElementById("surgery-limb").value,
+      cta: document.getElementById("surgery-cta").value,
+      angioplastySegments: segments,
+      angioplastyDate: document.getElementById("surgery-date").value,
+      radiologicalSuccess: document.getElementById("surgery-success").value,
+      postSurgeryAmputation: document.getElementById("surgery-amputation").value,
+      amputationType: document.getElementById("surgery-amputation").value === 'Y' ? document.getElementById("surgery-amputation-type").value : '',
+      amputationFreePeriod: document.getElementById("surgery-amputation-free").value,
+      woundHealed: document.querySelector('input[name="wound-healed"]:checked')?.value || '',
+      healingTime: document.querySelector('input[name="wound-healed"]:checked')?.value === 'Y' ? parseInt(document.getElementById("healing-time").value) : null,
+      postProcedures: Array.from(document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked'))
+        .filter(checkbox => checkbox.id === 'minor-amp' || checkbox.id === 'major-amp' || checkbox.id === 'bypass' || checkbox.id === 'reintervention')
+        .map(checkbox => checkbox.value),
+      postMobility: document.querySelector('input[name="post-mobility"]:checked')?.value || '',
+      currentMobility: document.querySelector('input[name="current-mobility"]:checked')?.value || '',
+      footwear: document.querySelector('input[name="footwear"]:checked')?.value || '',
+      newUlcers: document.getElementById("new-ulcers").checked,
+      painAtRest: document.getElementById("pain-rest").checked,
+      hospitalAdmission: document.getElementById("hospital-admit").checked,
+      qualityOfLifeScore: parseInt(document.getElementById("qol-score").value),
+      satisfaction: document.querySelector('input[name="satisfaction"]:checked')?.value || '',
+      timestamp: new Date()
+    };
+
+    db.collection("surgeryData").add(data)
+      .then(() => {
+        document.getElementById("surgery-submit-message").innerText = "Surgery data submitted successfully!";
+        // Clear form
+        document.querySelectorAll("#surgery-data-section input:not([type='radio']):not([type='checkbox']), #surgery-data-section textarea, #surgery-data-section select").forEach(el => el.value = '');
+        document.querySelectorAll("#surgery-data-section input[type='radio'], #surgery-data-section input[type='checkbox']").forEach(el => el.checked = false);
+      })
+      .catch(err => {
+        document.getElementById("surgery-submit-message").innerText = err.message;
+      });
   }
 
   function loadPatients() {
@@ -368,7 +625,7 @@
       document.getElementById("dateOfSurgery").value = d.dateOfSurgery || "";
       document.getElementById("surgeon").value = d.surgeon || "";
 
-      showAddPatient(); // Switch to form view
+      showAddPatient();
     });
   }
 
@@ -408,10 +665,6 @@
         });
         list.innerHTML = items || "<li>No pending surgeries</li>";
       });
-  }
-
-  function showSurgeryData() {
-    alert("Surgery Data feature is coming soon!");
   }
 </script>
 
