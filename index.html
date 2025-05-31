@@ -33,10 +33,6 @@
       width: 250px;
       flex-shrink: 0;
     }
-    .center-panel {
-      flex: 1;
-      min-width: 0;
-    }
     .right-panel {
       width: 300px;
       flex-shrink: 0;
@@ -52,17 +48,17 @@
     button {
       padding: 12px 24px;
       border: none;
-      background-color: #1976d2;
+      background-color: #800000; /* Maroon color */
       color: white;
       border-radius: 8px;
       cursor: pointer;
       margin-right: 10px;
     }
     button:hover {
-      background-color: #125ea3;
+      background-color: #600000; /* Darker maroon on hover */
     }
     .nav-btn {
-      background-color: #2196f3;
+      background-color: #800000; /* Maroon color */
       padding: 20px 15px;
       font-size: 18px;
       border-radius: 12px;
@@ -71,6 +67,7 @@
       cursor: pointer;
       white-space: nowrap;
       margin-bottom: 15px;
+      color: white;
     }
     .loading {
       text-align: center;
@@ -126,7 +123,7 @@
       .dashboard {
         flex-direction: column;
       }
-      .left-panel, .center-panel, .right-panel {
+      .left-panel, .right-panel {
         width: 100%;
       }
       .left-panel {
@@ -175,14 +172,6 @@
         <div class="container nav-btn" onclick="showBrowsePatients()">Browse Patients</div>
         <div class="container nav-btn" onclick="showSurgeryData()">Surgery Data</div>
         <div class="container"><button onclick="logout()">Logout</button></div>
-      </div>
-
-      <!-- Center Panel -->
-      <div class="center-panel">
-        <div class="container">
-          <h3>Clinic Details</h3>
-          <p>Provide details about the clinic, services, and any relevant information for visitors.</p>
-        </div>
       </div>
 
       <!-- Right Panel -->
