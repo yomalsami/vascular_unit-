@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Vascular Clinic Patient DB</title>
+  <title>Vascular Clinic Online Portal</title>
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -186,7 +186,7 @@
 
   <!-- Login Section -->
   <div class="container" id="login-section">
-    <h3>Login to Vascular DB</h3>
+    <h3>Login to Vascular Clinic Online Portal</h3>
     <input type="email" id="email" placeholder="Email">
     <input type="password" id="password" placeholder="Password">
     <button onclick="login()">Login</button>
@@ -199,9 +199,9 @@
     <div class="dashboard">
       <!-- Left Panel -->
       <div class="left-panel">
-        <div class="container nav-btn" onclick="showAddPatient()">Add Patient</div>
-        <div class="container nav-btn" onclick="showBrowsePatients()">Browse Patients</div>
-        <div class="container nav-btn" onclick="showSurgeryDataForm()">Surgery Data</div>
+        <div class="container nav-btn" onclick="showAddPatient()">Schedule a Major Surgery</div>
+        <div class="container nav-btn" onclick="showBrowsePatients()">Browse Surgeries</div>
+        <div class="container nav-btn" onclick="showSurgeryDataForm()">Angioplasty Registry</div>
         <div class="container"><button onclick="logout()">Logout</button></div>
       </div>
 
@@ -217,7 +217,7 @@
 
   <!-- Add Patient Form -->
   <div class="container hidden form-container" id="form-section">
-    <h3>Add New Patient</h3>
+    <h3>Schedule A New Surgery</h3>
     <input type="hidden" id="patientId">
     <label>Full Name</label><input type="text" id="name">
     <label>Age</label><input type="number" id="age">
