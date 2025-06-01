@@ -1,183 +1,348 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Vascular Clinic Patient DB</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vascular and Transplant Surgery Unit - CNTH</title>
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
+    :root {
+      --maroon: #800000;
+      --maroon-dark: #600000;
+      --maroon-light: #a00000;
+      --white: #ffffff;
+      --light-gray: #f8f9fa;
+      --medium-gray: #e9ecef;
+      --dark-gray: #495057;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease;
+      --border-radius: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
       margin: 0;
-      padding: 20px;
-      background-color: #f4f6f8;
+      padding: 0;
     }
-    h2, h3, h4 {
-      text-align: center;
-      margin-top: 0;
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background-color: var(--light-gray);
+      color: var(--dark-gray);
+      line-height: 1.6;
+      min-height: 100vh;
     }
+
     .container {
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
-    }
-    .dashboard {
-      display: flex;
-      gap: 30px;
       width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
     }
-    .left-panel {
-      width: 280px;
-      flex-shrink: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
+
+    /* Login Section */
+    #login-section {
+      max-width: 400px;
+      margin: 5rem auto;
+      padding: 2rem;
+      background: var(--white);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      text-align: center;
     }
-    .right-panel {
-      width: 320px;
-      flex-shrink: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
+
+    #login-section h3 {
+      color: var(--maroon);
+      margin-bottom: 1.5rem;
     }
-    input, textarea, select {
+
+    #login-section input {
       width: 100%;
-      padding: 10px;
-      margin-top: 6px;
-      margin-bottom: 20px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-    button {
-      padding: 12px 24px;
-      border: none;
-      background-color: #800000;
-      color: white;
+      padding: 0.8rem;
+      margin-bottom: 1rem;
+      border: 1px solid var(--medium-gray);
       border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    #login-section button {
+      background-color: var(--maroon);
+      color: var(--white);
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      font-size: 1rem;
       cursor: pointer;
-      margin-right: 10px;
-      transition: background-color 0.3s;
-    }
-    button:hover {
-      background-color: #600000;
-    }
-    .nav-btn {
-      background-color: #800000;
-      padding: 20px 15px;
-      font-size: 18px;
-      border-radius: 12px;
-      text-align: center;
+      transition: var(--transition);
       width: 100%;
-      cursor: pointer;
-      white-space: nowrap;
-      color: white;
     }
-    .loading {
-      text-align: center;
-      color: #666;
-      font-size: 14px;
-      margin-top: 10px;
+
+    #login-section button:hover {
+      background-color: var(--maroon-dark);
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 15px;
+
+    #login-error {
+      color: #dc3545;
+      margin-top: 1rem;
     }
-    th, td {
-      padding: 12px 8px;
-      border: 1px solid #ccc;
-      text-align: left;
-    }
-    thead {
-      background-color: #e3f2fd;
-    }
+
     .hidden {
       display: none;
     }
-    footer {
+
+    /* Dashboard */
+    .header {
       text-align: center;
-      margin-top: 60px;
-      color: #777;
-      font-size: 14px;
+      margin-bottom: 3rem;
     }
-    .pending-surgeries {
-      background: #fff3e0;
-      border-left: 6px solid #ff9800;
-      padding: 20px;
-      border-radius: 8px;
-      margin-bottom: 0;
+
+    .clinic-title {
+      color: var(--maroon);
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
     }
-    .form-container {
-      max-width: 800px;
-      margin: 0 auto;
+
+    .clinic-subtitle {
+      color: var(--dark-gray);
+      font-size: 1.2rem;
+      font-weight: 400;
     }
-    .back-btn {
-      background-color: #757575;
-      margin-top: 20px;
-    }
-    .checkbox-group {
-      margin: 15px 0;
-    }
-    .checkbox-option {
-      margin: 8px 0;
+
+    .dashboard-actions {
       display: flex;
-      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      margin: 3rem 0;
     }
-    .checkbox-option input {
-      width: auto;
-      margin-right: 10px;
-      margin-bottom: 0;
+
+    .action-card {
+      background: var(--white);
+      border-radius: var(--border-radius);
+      width: 280px;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+      border: 1px solid var(--medium-gray);
+      cursor: pointer;
     }
+
+    .action-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+      border-color: var(--maroon-light);
+    }
+
+    .action-icon {
+      font-size: 2.5rem;
+      color: var(--maroon);
+      margin-bottom: 1rem;
+    }
+
+    .action-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--maroon);
+      margin-bottom: 0.5rem;
+    }
+
+    .action-description {
+      font-size: 0.95rem;
+      color: var(--dark-gray);
+      margin-bottom: 1.5rem;
+    }
+
+    .action-button {
+      background-color: var(--maroon);
+      color: var(--white);
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      width: 100%;
+    }
+
+    .action-button:hover {
+      background-color: var(--maroon-dark);
+    }
+
+    .logout-container {
+      text-align: center;
+      margin-top: 3rem;
+    }
+
+    .logout-button {
+      background-color: var(--dark-gray);
+      color: var(--white);
+      border: none;
+      padding: 0.8rem 2rem;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .logout-button:hover {
+      background-color: #343a40;
+    }
+
+    /* Forms */
+    .form-container {
+      background: var(--white);
+      border-radius: var(--border-radius);
+      padding: 2rem;
+      box-shadow: var(--shadow);
+      margin: 2rem auto;
+      max-width: 800px;
+    }
+
+    .form-container h3 {
+      color: var(--maroon);
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
     .form-section {
-      margin-bottom: 25px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid #eee;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--medium-gray);
     }
+
     .form-section:last-child {
       border-bottom: none;
     }
 
-    @media (max-width: 1200px) {
-      .right-panel {
-        width: 280px;
-      }
+    .form-section h4 {
+      color: var(--maroon);
+      margin-bottom: 1rem;
     }
 
-    @media (max-width: 992px) {
-      .dashboard {
-        flex-direction: column;
-        gap: 20px;
-      }
-      .left-panel, .right-panel {
-        width: 100%;
-      }
-      .left-panel {
-        flex-direction: row;
-        flex-wrap: wrap;
-      }
-      .left-panel .container {
-        flex: 1;
-        min-width: 200px;
-      }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
     }
 
-    @media (max-width: 576px) {
-      body {
-        padding: 15px;
-      }
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    input[type="email"],
+    input[type="password"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 0.8rem;
+      margin-bottom: 1rem;
+      border: 1px solid var(--medium-gray);
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    .checkbox-group {
+      margin: 1rem 0;
+    }
+
+    .checkbox-option {
+      margin: 0.5rem 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .checkbox-option input {
+      width: auto;
+      margin-right: 0.5rem;
+    }
+
+    button {
+      background-color: var(--maroon);
+      color: var(--white);
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-right: 1rem;
+    }
+
+    button:hover {
+      background-color: var(--maroon-dark);
+    }
+
+    .back-btn {
+      background-color: var(--dark-gray);
+    }
+
+    .back-btn:hover {
+      background-color: #343a40;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+      font-size: 0.9rem;
+    }
+
+    th, td {
+      padding: 0.75rem;
+      border: 1px solid var(--medium-gray);
+      text-align: left;
+    }
+
+    th {
+      background-color: var(--maroon);
+      color: var(--white);
+    }
+
+    tr:nth-child(even) {
+      background-color: var(--light-gray);
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      margin-top: 3rem;
+      padding: 1rem;
+      color: var(--dark-gray);
+      font-size: 0.9rem;
+    }
+
+    footer a {
+      color: var(--maroon);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
       .container {
-        padding: 15px;
+        padding: 1rem;
       }
-      .nav-btn {
-        padding: 15px 10px;
-        font-size: 16px;
-      }
-      .left-panel {
+
+      .dashboard-actions {
         flex-direction: column;
+        align-items: center;
+      }
+
+      .action-card {
+        width: 100%;
+        max-width: 350px;
+      }
+
+      .clinic-title {
+        font-size: 1.8rem;
       }
     }
   </style>
@@ -196,70 +361,125 @@
 
   <!-- Dashboard Section -->
   <div class="hidden" id="dashboard-section">
-    <div class="dashboard">
-      <!-- Left Panel -->
-      <div class="left-panel">
-        <div class="container nav-btn" onclick="showAddPatient()">Add Patient</div>
-        <div class="container nav-btn" onclick="showBrowsePatients()">Browse Patients</div>
-        <div class="container nav-btn" onclick="showSurgeryDataForm()">Surgery Data</div>
-        <div class="container"><button onclick="logout()">Logout</button></div>
+    <div class="container">
+      <div class="header">
+        <h1 class="clinic-title">Vascular and Transplant Surgery Unit - CNTH</h1>
+        <p class="clinic-subtitle">Comprehensive patient management system</p>
       </div>
 
-      <!-- Right Panel -->
-      <div class="right-panel">
-        <div class="container pending-surgeries">
-          <h4>Pending Surgeries</h4>
-          <ul id="surgeryList"></ul>
+      <div class="dashboard-actions">
+        <div class="action-card" onclick="showAddPatient()">
+          <div class="action-icon">🩺</div>
+          <h3 class="action-title">Schedule A Surgery</h3>
+          <p class="action-description">Register new patients and schedule surgical procedures</p>
+          <button class="action-button">Access</button>
         </div>
+
+        <div class="action-card" onclick="showBrowsePatients()">
+          <div class="action-icon">📅</div>
+          <h3 class="action-title">Scheduled Surgeries</h3>
+          <p class="action-description">View and manage upcoming surgical procedures</p>
+          <button class="action-button">Access</button>
+        </div>
+
+        <div class="action-card" onclick="showSurgeryDataForm()">
+          <div class="action-icon">📊</div>
+          <h3 class="action-title">Angioplasty Registry</h3>
+          <p class="action-description">Document and analyze angioplasty outcomes</p>
+          <button class="action-button">Access</button>
+        </div>
+      </div>
+
+      <div class="logout-container">
+        <button class="logout-button" onclick="logout()">Logout</button>
       </div>
     </div>
   </div>
 
-  <!-- Add Patient Form -->
+  <!-- Schedule A Surgery Form -->
   <div class="container hidden form-container" id="form-section">
-    <h3>Add New Patient</h3>
+    <h3>Schedule A Surgery</h3>
     <input type="hidden" id="patientId">
-    <label>Full Name</label><input type="text" id="name">
-    <label>Age</label><input type="number" id="age">
-    <label>Gender</label><input type="text" id="gender">
-    <label>Diagnosis</label><textarea id="diagnosis"></textarea>
-    <label>Interventions</label><textarea id="interventions"></textarea>
-    <label>Date of Visit</label><input type="date" id="visitDate">
-    <label>Hospital Stay (days)</label><input type="number" id="stay">
-    <label>Contact Number</label><input type="text" id="contact">
-    <label>Remarks / Notes</label><textarea id="notes"></textarea>
-    <label>Planned Surgery</label><input type="text" id="plannedSurgery">
-    <label>Date of Surgery</label><input type="date" id="dateOfSurgery">
-    <label>Surgeon</label><input type="text" id="surgeon">
+    
+    <div class="form-section">
+      <h4>Patient Information</h4>
+      <label>Full Name</label>
+      <input type="text" id="name">
+      
+      <label>Age</label>
+      <input type="number" id="age">
+      
+      <label>Gender</label>
+      <select id="gender">
+        <option value="">Select</option>
+        <option value="Male">Male</option>
+        <option value="Female">Female</option>
+        <option value="Other">Other</option>
+      </select>
+      
+      <label>Contact Number</label>
+      <input type="text" id="contact">
+    </div>
+    
+    <div class="form-section">
+      <h4>Medical Details</h4>
+      <label>Diagnosis</label>
+      <textarea id="diagnosis" rows="3"></textarea>
+      
+      <label>Planned Surgery</label>
+      <input type="text" id="plannedSurgery">
+      
+      <label>Date of Surgery</label>
+      <input type="date" id="dateOfSurgery">
+      
+      <label>Surgeon</label>
+      <input type="text" id="surgeon">
+    </div>
+    
+    <div class="form-section">
+      <h4>Additional Information</h4>
+      <label>Interventions</label>
+      <textarea id="interventions" rows="3"></textarea>
+      
+      <label>Remarks / Notes</label>
+      <textarea id="notes" rows="3"></textarea>
+    </div>
+    
     <button onclick="submitPatient()">Submit</button>
     <button class="back-btn" onclick="backToDashboard()">Back to Dashboard</button>
     <p id="submit-message" style="color: green;"></p>
   </div>
 
-  <!-- Browse Patients Section -->
+  <!-- Scheduled Surgeries Section -->
   <div class="container hidden" id="browse-section">
-    <h3>Patient List</h3>
-    <input type="text" id="searchInput" placeholder="Search by name..." oninput="filterPatients()" />
-    <div style="overflow-x: auto; max-width: 100%;">
+    <h3>Scheduled Surgeries</h3>
+    <input type="text" id="searchInput" placeholder="Search by name..." oninput="filterPatients()">
+    
+    <div style="overflow-x: auto; margin: 1rem 0;">
       <table>
         <thead>
           <tr>
-            <th>Name</th><th>Age</th><th>Gender</th><th>Diagnosis</th><th>Interventions</th>
-            <th>Visit Date</th><th>Stay</th><th>Contact</th><th>Notes</th>
-            <th>Planned Surgery</th><th>Date of Surgery</th><th>Surgeon</th>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Gender</th>
+            <th>Diagnosis</th>
+            <th>Planned Surgery</th>
+            <th>Date of Surgery</th>
+            <th>Surgeon</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody id="patientTableBody"></tbody>
       </table>
     </div>
-    <br>
+    
     <button onclick="downloadExcel()">Download Excel</button>
     <button class="back-btn" onclick="backToDashboard()">Back to Dashboard</button>
   </div>
 
-  <!-- Surgery Data Form -->
+  <!-- Angioplasty Registry Form -->
   <div class="container hidden form-container" id="surgery-data-section">
-    <h3>Surgery Data Collection</h3>
+    <h3>Angioplasty Registry</h3>
     
     <div class="form-section">
       <h4>Patient Information</h4>
@@ -278,9 +498,6 @@
       
       <label>Telephone Number</label>
       <input type="text" id="surgery-phone">
-      
-      <label>Clinical History Before Surgery</label>
-      <textarea id="surgery-history"></textarea>
     </div>
     
     <div class="form-section">
@@ -309,8 +526,8 @@
     </div>
     
     <div class="form-section">
-      <h4>Medical History and Risk Factors</h4>
-      <label>Do you have any of the following conditions?</label>
+      <h4>Medical History</h4>
+      <label>Do you have any of these conditions?</label>
       <div class="checkbox-group">
         <div class="checkbox-option"><input type="checkbox" id="diabetes" value="Diabetes Mellitus"> <label for="diabetes">Diabetes Mellitus</label></div>
         <div class="checkbox-option"><input type="checkbox" id="hypertension" value="Hypertension"> <label for="hypertension">Hypertension</label></div>
@@ -327,7 +544,7 @@
         <input type="text" id="previous-surgery-text">
       </div>
       
-      <label>Are you currently on any of the following medications?</label>
+      <label>Current Medications</label>
       <div class="checkbox-group">
         <div class="checkbox-option"><input type="checkbox" id="aspirin" value="Aspirin"> <label for="aspirin">Aspirin</label></div>
         <div class="checkbox-option"><input type="checkbox" id="clopidogrel" value="Clopidogrel"> <label for="clopidogrel">Clopidogrel</label></div>
@@ -344,16 +561,13 @@
     </div>
     
     <div class="form-section">
-      <h4>Surgical Details</h4>
+      <h4>Procedure Details</h4>
       <label>Affected Limb</label>
       <select id="surgery-limb">
         <option value="">Select</option>
         <option value="R">Right</option>
         <option value="L">Left</option>
       </select>
-      
-      <label>CTA</label>
-      <input type="text" id="surgery-cta">
       
       <label>Angioplasty Segments</label>
       <div class="checkbox-group">
@@ -373,33 +587,7 @@
     </div>
     
     <div class="form-section">
-      <h4>Post-Surgical Outcomes</h4>
-      <label>Post Surgery Amputation</label>
-      <select id="surgery-amputation">
-        <option value="">Select</option>
-        <option value="Y">Yes</option>
-        <option value="N">No</option>
-      </select>
-      
-      <div id="amputation-type-container" class="hidden">
-        <label>Amputation Type</label>
-        <select id="surgery-amputation-type">
-          <option value="">Select</option>
-          <option value="Toe">Toe</option>
-          <option value="Forefoot">Forefoot</option>
-          <option value="BKA">Below Knee Amputation (BKA)</option>
-          <option value="AKA">Above Knee Amputation (AKA)</option>
-        </select>
-      </div>
-      
-      <label>Amputation Free Period</label>
-      <select id="surgery-amputation-free">
-        <option value="">Select</option>
-        <option value="<30">Less than 30 days</option>
-        <option value="1year">1 year</option>
-        <option value="5years">5 years</option>
-      </select>
-      
+      <h4>Outcomes</h4>
       <label>Was the wound/ulcer healed following angioplasty?</label>
       <div class="checkbox-group">
         <div class="checkbox-option"><input type="radio" name="wound-healed" id="wound-yes" value="Y"> <label for="wound-yes">Yes</label></div>
@@ -411,28 +599,14 @@
         <input type="number" id="healing-time">
       </div>
 
-      <!-- NEW QUESTION ADDED HERE -->
       <label>Did you require following intervention after first intervention?</label>
       <div class="checkbox-group">
         <div class="checkbox-option"><input type="checkbox" id="repeat-angio" value="Repeat angioplasty"> <label for="repeat-angio">Repeat angioplasty</label></div>
         <div class="checkbox-option"><input type="checkbox" id="stenting" value="Stenting"> <label for="stenting">Stenting</label></div>
         <div class="checkbox-option"><input type="checkbox" id="bypass-surgery" value="Bypass surgery"> <label for="bypass-surgery">Bypass surgery</label></div>
       </div>
-    </div>
-    
-    <div class="form-section">
-      <h4>Follow-up Information</h4>
-      <label>Have you experienced:</label>
-      <div class="checkbox-group">
-        <div class="checkbox-option"><input type="checkbox" id="new-ulcers" value="New ulcers"> <label for="new-ulcers">New ulcers</label></div>
-        <div class="checkbox-option"><input type="checkbox" id="pain-rest" value="Pain at rest"> <label for="pain-rest">Pain at rest</label></div>
-        <div class="checkbox-option"><input type="checkbox" id="hospital-admit" value="Hospital admission"> <label for="hospital-admit">Any hospital admission after angioplasty?</label></div>
-      </div>
       
-      <label>On a scale of 1–10, how would you rate your quality of life now? (1 = worst, 10 = best)</label>
-      <input type="number" id="qol-score" min="1" max="10">
-      
-      <label>How satisfied are you with the outcome of the angioplasty?</label>
+      <label>How satisfied are you with the outcome?</label>
       <div class="checkbox-group">
         <div class="checkbox-option"><input type="radio" name="satisfaction" id="satisfaction-vs" value="Very satisfied"> <label for="satisfaction-vs">Very satisfied</label></div>
         <div class="checkbox-option"><input type="radio" name="satisfaction" id="satisfaction-s" value="Satisfied"> <label for="satisfaction-s">Satisfied</label></div>
@@ -442,15 +616,13 @@
       </div>
     </div>
     
-    <button onclick="submitSurgeryData()">Submit Surgery Data</button>
+    <button onclick="submitSurgeryData()">Submit</button>
     <button class="back-btn" onclick="backToDashboard()">Back to Dashboard</button>
     <p id="surgery-submit-message" style="color: green;"></p>
   </div>
 
   <footer>
-    Made by <a href="https://dryomal.com" target="_blank" style="color: #1976d2; text-decoration: none;">
-      Dr. Yomal Amarathunge ⚕️
-    </a>
+    Made by <a href="https://dryomal.com" target="_blank">Dr. Yomal Amarathunge ⚕️</a>
   </footer>
 
 <script>
@@ -478,10 +650,6 @@
     document.getElementById('other-meds-details').classList.toggle('hidden', !this.checked);
   });
 
-  document.getElementById('surgery-amputation').addEventListener('change', function() {
-    document.getElementById('amputation-type-container').classList.toggle('hidden', this.value !== 'Y');
-  });
-
   document.querySelectorAll('input[name="wound-healed"]').forEach(radio => {
     radio.addEventListener('change', function() {
       document.getElementById('healing-time-container').classList.toggle('hidden', this.value !== 'Y');
@@ -492,7 +660,6 @@
     if (user) {
       document.getElementById("login-section").classList.add("hidden");
       document.getElementById("dashboard-section").classList.remove("hidden");
-      loadPendingSurgeries();
     } else {
       document.getElementById("login-section").classList.remove("hidden");
       document.getElementById("dashboard-section").classList.add("hidden");
@@ -553,13 +720,11 @@
       gender: document.getElementById("gender").value,
       diagnosis: document.getElementById("diagnosis").value,
       interventions: document.getElementById("interventions").value,
-      visitDate: document.getElementById("visitDate").value,
-      stay: parseInt(document.getElementById("stay").value),
-      contact: document.getElementById("contact").value,
-      notes: document.getElementById("notes").value,
       plannedSurgery: document.getElementById("plannedSurgery").value,
       dateOfSurgery: document.getElementById("dateOfSurgery").value,
       surgeon: document.getElementById("surgeon").value,
+      contact: document.getElementById("contact").value,
+      notes: document.getElementById("notes").value,
       timestamp: new Date()
     };
 
@@ -626,7 +791,6 @@
       age: parseInt(document.getElementById("surgery-age").value),
       sex: document.getElementById("surgery-sex").value,
       phone: document.getElementById("surgery-phone").value,
-      clinicalHistory: document.getElementById("surgery-history").value,
       
       // Lifestyle Factors
       smokingHistory: document.querySelector('input[name="smoking"]:checked')?.value || '',
@@ -646,26 +810,15 @@
       
       // Surgical Details
       affectedLimb: document.getElementById("surgery-limb").value,
-      cta: document.getElementById("surgery-cta").value,
       angioplastySegments: segments,
       angioplastyDate: document.getElementById("surgery-date").value,
       radiologicalSuccess: document.getElementById("surgery-success").value,
       
-      // Post-Surgical Outcomes
-      postSurgeryAmputation: document.getElementById("surgery-amputation").value,
-      amputationType: document.getElementById("surgery-amputation").value === 'Y' ? 
-                     document.getElementById("surgery-amputation-type").value : '',
-      amputationFreePeriod: document.getElementById("surgery-amputation-free").value,
+      // Outcomes
       woundHealed: document.querySelector('input[name="wound-healed"]:checked')?.value || '',
       healingTime: document.querySelector('input[name="wound-healed"]:checked')?.value === 'Y' ? 
                   parseInt(document.getElementById("healing-time").value) : null,
       postInterventions: postInterventions,
-      
-      // Follow-up Information
-      newUlcers: document.getElementById("new-ulcers").checked,
-      painAtRest: document.getElementById("pain-rest").checked,
-      hospitalAdmission: document.getElementById("hospital-admit").checked,
-      qualityOfLifeScore: parseInt(document.getElementById("qol-score").value),
       satisfaction: document.querySelector('input[name="satisfaction"]:checked')?.value || '',
       
       timestamp: new Date()
@@ -685,21 +838,24 @@
 
   function loadPatients() {
     const tbody = document.getElementById("patientTableBody");
-    tbody.innerHTML = "<tr><td colspan='13'>Loading...</td></tr>";
+    tbody.innerHTML = "<tr><td colspan='8'>Loading...</td></tr>";
     db.collection("patients").orderBy("timestamp", "desc").get().then(snapshot => {
       let rows = "";
       snapshot.forEach(doc => {
         const d = doc.data();
         rows += `
           <tr>
-            <td>${d.name || ""}</td><td>${d.age || ""}</td><td>${d.gender || ""}</td>
-            <td>${d.diagnosis || ""}</td><td>${d.interventions || ""}</td><td>${d.visitDate || ""}</td>
-            <td>${d.stay || ""}</td><td>${d.contact || ""}</td><td>${d.notes || ""}</td>
-            <td>${d.plannedSurgery || ""}</td><td>${d.dateOfSurgery || ""}</td><td>${d.surgeon || ""}</td>
+            <td>${d.name || ""}</td>
+            <td>${d.age || ""}</td>
+            <td>${d.gender || ""}</td>
+            <td>${d.diagnosis || ""}</td>
+            <td>${d.plannedSurgery || ""}</td>
+            <td>${d.dateOfSurgery || ""}</td>
+            <td>${d.surgeon || ""}</td>
             <td><button onclick="editPatient('${doc.id}')">Edit</button></td>
           </tr>`;
       });
-      tbody.innerHTML = rows || "<tr><td colspan='13'>No patients found.</td></tr>";
+      tbody.innerHTML = rows || "<tr><td colspan='8'>No patients found.</td></tr>";
     });
   }
 
@@ -712,13 +868,11 @@
       document.getElementById("gender").value = d.gender || "";
       document.getElementById("diagnosis").value = d.diagnosis || "";
       document.getElementById("interventions").value = d.interventions || "";
-      document.getElementById("visitDate").value = d.visitDate || "";
-      document.getElementById("stay").value = d.stay || "";
-      document.getElementById("contact").value = d.contact || "";
-      document.getElementById("notes").value = d.notes || "";
       document.getElementById("plannedSurgery").value = d.plannedSurgery || "";
       document.getElementById("dateOfSurgery").value = d.dateOfSurgery || "";
       document.getElementById("surgeon").value = d.surgeon || "";
+      document.getElementById("contact").value = d.contact || "";
+      document.getElementById("notes").value = d.notes || "";
 
       showAddPatient();
     });
