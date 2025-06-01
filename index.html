@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Vascular Clinic Online Portal</title>
+  <title>Vascular Clinic Patient DB</title>
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -186,7 +186,7 @@
 
   <!-- Login Section -->
   <div class="container" id="login-section">
-    <h3>Login to Vascular Clinic Online Portal</h3>
+    <h3>Login to Vascular DB</h3>
     <input type="email" id="email" placeholder="Email">
     <input type="password" id="password" placeholder="Password">
     <button onclick="login()">Login</button>
@@ -199,9 +199,9 @@
     <div class="dashboard">
       <!-- Left Panel -->
       <div class="left-panel">
-        <div class="container nav-btn" onclick="showAddPatient()">Schedule a Major Surgery</div>
-        <div class="container nav-btn" onclick="showBrowsePatients()">Browse Surgeries</div>
-        <div class="container nav-btn" onclick="showSurgeryDataForm()">Angioplasty Registry</div>
+        <div class="container nav-btn" onclick="showAddPatient()">Add Patient</div>
+        <div class="container nav-btn" onclick="showBrowsePatients()">Browse Patients</div>
+        <div class="container nav-btn" onclick="showSurgeryDataForm()">Surgery Data</div>
         <div class="container"><button onclick="logout()">Logout</button></div>
       </div>
 
@@ -217,7 +217,7 @@
 
   <!-- Add Patient Form -->
   <div class="container hidden form-container" id="form-section">
-    <h3>Schedule A New Surgery</h3>
+    <h3>Add New Patient</h3>
     <input type="hidden" id="patientId">
     <label>Full Name</label><input type="text" id="name">
     <label>Age</label><input type="number" id="age">
@@ -281,6 +281,66 @@
       
       <label>Clinical History Before Surgery</label>
       <textarea id="surgery-history"></textarea>
+    </div>
+    
+    <div class="form-section">
+      <h4>Lifestyle Factors</h4>
+      <label>Smoking History</label>
+      <div class="checkbox-group">
+        <div class="checkbox-option"><input type="radio" name="smoking" id="smoking-never" value="Never"> <label for="smoking-never">Never</label></div>
+        <div class="checkbox-option"><input type="radio" name="smoking" id="smoking-former" value="Former"> <label for="smoking-former">Former</label></div>
+        <div class="checkbox-option"><input type="radio" name="smoking" id="smoking-current" value="Current"> <label for="smoking-current">Current</label></div>
+      </div>
+      
+      <div id="current-smoker-details" class="hidden">
+        <label>No. of cigarettes/day</label>
+        <input type="number" id="cigarettes-per-day">
+        
+        <label>Duration (years)</label>
+        <input type="number" id="smoking-duration">
+      </div>
+      
+      <label>Alcohol Use</label>
+      <div class="checkbox-group">
+        <div class="checkbox-option"><input type="radio" name="alcohol" id="alcohol-no" value="No"> <label for="alcohol-no">No</label></div>
+        <div class="checkbox-option"><input type="radio" name="alcohol" id="alcohol-occasional" value="Occasionally"> <label for="alcohol-occasional">Occasionally</label></div>
+        <div class="checkbox-option"><input type="radio" name="alcohol" id="alcohol-regular" value="Regularly"> <label for="alcohol-regular">Regularly</label></div>
+      </div>
+    </div>
+    
+    <div class="form-section">
+      <h4>Medical History and Risk Factors</h4>
+      <label>Do you have any of the following conditions?</label>
+      <div class="checkbox-group">
+        <div class="checkbox-option"><input type="checkbox" id="diabetes" value="Diabetes Mellitus"> <label for="diabetes">Diabetes Mellitus</label></div>
+        <div class="checkbox-option"><input type="checkbox" id="hypertension" value="Hypertension"> <label for="hypertension">Hypertension</label></div>
+        <div class="checkbox-option"><input type="checkbox" id="ihd" value="Ischemic Heart Disease"> <label for="ihd">Ischemic Heart Disease</label></div>
+        <div class="checkbox-option"><input type="checkbox" id="ckd" value="Chronic Kidney Disease"> <label for="ckd">Chronic Kidney Disease</label></div>
+        <div class="checkbox-option"><input type="checkbox" id="stroke" value="History of Stroke"> <label for="stroke">History of Stroke</label></div>
+        <div class="checkbox-option"><input type="checkbox" id="heart-failure" value="Heart Failure"> <label for="heart-failure">Heart Failure</label></div>
+        <div class="checkbox-option"><input type="checkbox" id="hyperlipidemia" value="Hyperlipidemia"> <label for="hyperlipidemia">Hyperlipidemia</label></div>
+        <div class="checkbox-option"><input type="checkbox" id="previous-surgery" value="Previous lower limb surgery or angioplasty"> <label for="previous-surgery">Previous lower limb surgery or angioplasty</label></div>
+      </div>
+      
+      <div id="previous-surgery-details" class="hidden">
+        <label>If yes, details:</label>
+        <input type="text" id="previous-surgery-text">
+      </div>
+      
+      <label>Are you currently on any of the following medications?</label>
+      <div class="checkbox-group">
+        <div class="checkbox-option"><input type="checkbox" id="aspirin" value="Aspirin"> <label for="aspirin">Aspirin</label></div>
+        <div class="checkbox-option"><input type="checkbox" id="clopidogrel" value="Clopidogrel"> <label for="clopidogrel">Clopidogrel</label></div>
+        <div class="checkbox-option"><input type="checkbox" id="statins" value="Statins"> <label for="statins">Statins</label></div>
+        <div class="checkbox-option"><input type="checkbox" id="insulin" value="Insulin"> <label for="insulin">Insulin</label></div>
+        <div class="checkbox-option"><input type="checkbox" id="metformin" value="Metformin"> <label for="metformin">Metformin</label></div>
+        <div class="checkbox-option"><input type="checkbox" id="other-meds" value="Other"> <label for="other-meds">Other</label></div>
+      </div>
+      
+      <div id="other-meds-details" class="hidden">
+        <label>Other medications:</label>
+        <input type="text" id="other-meds-text">
+      </div>
     </div>
     
     <div class="form-section">
@@ -350,38 +410,13 @@
         <label>Time to healing (months)</label>
         <input type="number" id="healing-time">
       </div>
-    </div>
-    
-    <div class="form-section">
-      <h4>Post-Procedure Details</h4>
-      <label>Did you require any of the following after angioplasty?</label>
+
+      <!-- NEW QUESTION ADDED HERE -->
+      <label>Did you require following intervention after first intervention?</label>
       <div class="checkbox-group">
-        <div class="checkbox-option"><input type="checkbox" id="minor-amp" value="Minor amputation"> <label for="minor-amp">Minor amputation (e.g., toe)</label></div>
-        <div class="checkbox-option"><input type="checkbox" id="major-amp" value="Major amputation"> <label for="major-amp">Major amputation (below or above knee)</label></div>
-        <div class="checkbox-option"><input type="checkbox" id="bypass" value="Bypass surgery"> <label for="bypass">Bypass surgery</label></div>
-        <div class="checkbox-option"><input type="checkbox" id="reintervention" value="Re-intervention"> <label for="reintervention">Re-intervention (repeat angioplasty or stent)</label></div>
-      </div>
-      
-      <label>Were you mobile after the procedure?</label>
-      <div class="checkbox-group">
-        <div class="checkbox-option"><input type="radio" name="post-mobility" id="mobile-independent" value="Independently"> <label for="mobile-independent">Independently</label></div>
-        <div class="checkbox-option"><input type="radio" name="post-mobility" id="mobile-aid" value="With walking aid"> <label for="mobile-aid">With walking aid</label></div>
-        <div class="checkbox-option"><input type="radio" name="post-mobility" id="mobile-wheelchair" value="Wheelchair-bound"> <label for="mobile-wheelchair">Wheelchair-bound</label></div>
-        <div class="checkbox-option"><input type="radio" name="post-mobility" id="mobile-bedridden" value="Bedridden"> <label for="mobile-bedridden">Bedridden</label></div>
-      </div>
-      
-      <label>Current mobility status:</label>
-      <div class="checkbox-group">
-        <div class="checkbox-option"><input type="radio" name="current-mobility" id="mobility-full" value="Fully mobile"> <label for="mobility-full">Fully mobile</label></div>
-        <div class="checkbox-option"><input type="radio" name="current-mobility" id="mobility-partial" value="Partially mobile"> <label for="mobility-partial">Partially mobile</label></div>
-        <div class="checkbox-option"><input type="radio" name="current-mobility" id="mobility-dependent" value="Dependent for ADLs"> <label for="mobility-dependent">Dependent for activities of daily living (ADLs)</label></div>
-      </div>
-      
-      <label>Do you wear offloading footwear as advised?</label>
-      <div class="checkbox-group">
-        <div class="checkbox-option"><input type="radio" name="footwear" id="footwear-yes" value="Yes always"> <label for="footwear-yes">Yes always</label></div>
-        <div class="checkbox-option"><input type="radio" name="footwear" id="footwear-sometimes" value="Sometimes"> <label for="footwear-sometimes">Sometimes</label></div>
-        <div class="checkbox-option"><input type="radio" name="footwear" id="footwear-no" value="No"> <label for="footwear-no">No</label></div>
+        <div class="checkbox-option"><input type="checkbox" id="repeat-angio" value="Repeat angioplasty"> <label for="repeat-angio">Repeat angioplasty</label></div>
+        <div class="checkbox-option"><input type="checkbox" id="stenting" value="Stenting"> <label for="stenting">Stenting</label></div>
+        <div class="checkbox-option"><input type="checkbox" id="bypass-surgery" value="Bypass surgery"> <label for="bypass-surgery">Bypass surgery</label></div>
       </div>
     </div>
     
@@ -428,12 +463,25 @@
   const auth = firebase.auth();
   const db = firebase.firestore();
 
-  // Show amputation type field only if amputation is Yes
+  // Event listeners for conditional fields
+  document.querySelectorAll('input[name="smoking"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+      document.getElementById('current-smoker-details').classList.toggle('hidden', this.value !== 'Current');
+    });
+  });
+
+  document.getElementById('previous-surgery').addEventListener('change', function() {
+    document.getElementById('previous-surgery-details').classList.toggle('hidden', !this.checked);
+  });
+
+  document.getElementById('other-meds').addEventListener('change', function() {
+    document.getElementById('other-meds-details').classList.toggle('hidden', !this.checked);
+  });
+
   document.getElementById('surgery-amputation').addEventListener('change', function() {
     document.getElementById('amputation-type-container').classList.toggle('hidden', this.value !== 'Y');
   });
 
-  // Show healing time field only if wound healed is Yes
   document.querySelectorAll('input[name="wound-healed"]').forEach(radio => {
     radio.addEventListener('change', function() {
       document.getElementById('healing-time-container').classList.toggle('hidden', this.value !== 'Y');
@@ -538,41 +586,88 @@
   }
 
   function submitSurgeryData() {
+    // Get all selected medical conditions
+    const conditions = [];
+    document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked').forEach(checkbox => {
+      if (checkbox.id === 'diabetes' || checkbox.id === 'hypertension' || checkbox.id === 'ihd' || 
+          checkbox.id === 'ckd' || checkbox.id === 'stroke' || checkbox.id === 'heart-failure' || 
+          checkbox.id === 'hyperlipidemia' || checkbox.id === 'previous-surgery') {
+        conditions.push(checkbox.value);
+      }
+    });
+
+    // Get all selected medications
+    const medications = [];
+    document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked').forEach(checkbox => {
+      if (checkbox.id === 'aspirin' || checkbox.id === 'clopidogrel' || checkbox.id === 'statins' || 
+          checkbox.id === 'insulin' || checkbox.id === 'metformin' || checkbox.id === 'other-meds') {
+        medications.push(checkbox.value);
+      }
+    });
+
     // Get all selected angioplasty segments
     const segments = [];
     document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked').forEach(checkbox => {
-      if (checkbox.id !== 'new-ulcers' && checkbox.id !== 'pain-rest' && checkbox.id !== 'hospital-admit') {
+      if (checkbox.id === 'sfa' || checkbox.id === 'popliteal' || checkbox.id === 'pta' || 
+          checkbox.id === 'ata' || checkbox.id === 'tpt' || checkbox.id === 'peroneal') {
         segments.push(checkbox.value);
       }
     });
 
+    // Get post-intervention requirements
+    const postInterventions = [];
+    if (document.getElementById("repeat-angio").checked) postInterventions.push("Repeat angioplasty");
+    if (document.getElementById("stenting").checked) postInterventions.push("Stenting");
+    if (document.getElementById("bypass-surgery").checked) postInterventions.push("Bypass surgery");
+
     const data = {
+      // Patient Information
       name: document.getElementById("surgery-name").value,
       age: parseInt(document.getElementById("surgery-age").value),
       sex: document.getElementById("surgery-sex").value,
       phone: document.getElementById("surgery-phone").value,
       clinicalHistory: document.getElementById("surgery-history").value,
+      
+      // Lifestyle Factors
+      smokingHistory: document.querySelector('input[name="smoking"]:checked')?.value || '',
+      cigarettesPerDay: document.querySelector('input[name="smoking"]:checked')?.value === 'Current' ? 
+                        parseInt(document.getElementById("cigarettes-per-day").value) : null,
+      smokingDuration: document.querySelector('input[name="smoking"]:checked')?.value === 'Current' ? 
+                       parseInt(document.getElementById("smoking-duration").value) : null,
+      alcoholUse: document.querySelector('input[name="alcohol"]:checked')?.value || '',
+      
+      // Medical History
+      medicalConditions: conditions,
+      previousSurgeryDetails: document.getElementById("previous-surgery").checked ? 
+                             document.getElementById("previous-surgery-text").value : '',
+      medications: medications,
+      otherMedications: document.getElementById("other-meds").checked ? 
+                       document.getElementById("other-meds-text").value : '',
+      
+      // Surgical Details
       affectedLimb: document.getElementById("surgery-limb").value,
       cta: document.getElementById("surgery-cta").value,
       angioplastySegments: segments,
       angioplastyDate: document.getElementById("surgery-date").value,
       radiologicalSuccess: document.getElementById("surgery-success").value,
+      
+      // Post-Surgical Outcomes
       postSurgeryAmputation: document.getElementById("surgery-amputation").value,
-      amputationType: document.getElementById("surgery-amputation").value === 'Y' ? document.getElementById("surgery-amputation-type").value : '',
+      amputationType: document.getElementById("surgery-amputation").value === 'Y' ? 
+                     document.getElementById("surgery-amputation-type").value : '',
       amputationFreePeriod: document.getElementById("surgery-amputation-free").value,
       woundHealed: document.querySelector('input[name="wound-healed"]:checked')?.value || '',
-      healingTime: document.querySelector('input[name="wound-healed"]:checked')?.value === 'Y' ? parseInt(document.getElementById("healing-time").value) : null,
-      postProcedures: Array.from(document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked'))
-        .filter(checkbox => checkbox.id === 'minor-amp' || checkbox.id === 'major-amp' || checkbox.id === 'bypass' || checkbox.id === 'reintervention')
-        .map(checkbox => checkbox.value),
-      postMobility: document.querySelector('input[name="post-mobility"]:checked')?.value || '',
-      currentMobility: document.querySelector('input[name="current-mobility"]:checked')?.value || '',
-      footwear: document.querySelector('input[name="footwear"]:checked')?.value || '',
+      healingTime: document.querySelector('input[name="wound-healed"]:checked')?.value === 'Y' ? 
+                  parseInt(document.getElementById("healing-time").value) : null,
+      postInterventions: postInterventions,
+      
+      // Follow-up Information
       newUlcers: document.getElementById("new-ulcers").checked,
       painAtRest: document.getElementById("pain-rest").checked,
       hospitalAdmission: document.getElementById("hospital-admit").checked,
       qualityOfLifeScore: parseInt(document.getElementById("qol-score").value),
       satisfaction: document.querySelector('input[name="satisfaction"]:checked')?.value || '',
+      
       timestamp: new Date()
     };
 
