@@ -382,12 +382,12 @@
           <button class="action-button">Access</button>
         </div>
 
-        <div class="action-card" onclick="showSurgeryDataForm()">
-          <div class="action-icon">📊</div>
-          <h3 class="action-title">Angioplasty Registry</h3>
-          <p class="action-description">Document and analyze angioplasty outcomes</p>
-          <button class="action-button">Access</button>
-        </div>
+        <div class="action-card" onclick="showAngioplastyOptions()">
+  <div class="action-icon">📊</div>
+  <h3 class="action-title">Angioplasty Registry</h3>
+  <p class="action-description">Document and analyze angioplasty outcomes</p>
+  <button class="action-button">Access</button>
+</div>
       </div>
 
       <div class="logout-container">
@@ -620,6 +620,57 @@
     <button class="back-btn" onclick="backToDashboard()">Back to Dashboard</button>
     <p id="surgery-submit-message" style="color: green;"></p>
   </div>
+
+  <!-- Angioplasty Registry Options -->
+<div class="container hidden" id="angioplasty-options-section">
+  <h3>Angioplasty Registry</h3>
+  
+  <div class="dashboard-actions">
+    <div class="action-card" onclick="showSurgeryDataForm()">
+      <div class="action-icon">➕</div>
+      <h3 class="action-title">Add New Patient</h3>
+      <p class="action-description">Register new angioplasty procedure</p>
+      <button class="action-button">Add</button>
+    </div>
+
+    <div class="action-card" onclick="showBrowseAngioplasty()">
+      <div class="action-icon">🔍</div>
+      <h3 class="action-title">Browse Registry</h3>
+      <p class="action-description">View and analyze angioplasty data</p>
+      <button class="action-button">Browse</button>
+    </div>
+  </div>
+
+  <button class="back-btn" onclick="backToDashboard()">Back to Dashboard</button>
+</div>
+
+<!-- Browse Angioplasty Registry Section -->
+<div class="container hidden" id="browse-angioplasty-section">
+  <h3>Angioplasty Registry Data</h3>
+  <input type="text" id="angioSearchInput" placeholder="Search by name..." oninput="filterAngioplasty()">
+  
+  <div style="overflow-x: auto; margin: 1rem 0;">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Age</th>
+          <th>Sex</th>
+          <th>Affected Limb</th>
+          <th>Angioplasty Segments</th>
+          <th>Date</th>
+          <th>Success</th>
+          <th>Wound Healed</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="angioplastyTableBody"></tbody>
+    </table>
+  </div>
+  
+  <button onclick="downloadAngioplastyExcel()">Download Excel</button>
+  <button class="back-btn" onclick="showAngioplastyOptions()">Back to Options</button>
+</div>
 
   <footer>
     Made by <a href="https://dryomal.com" target="_blank">Dr. Yomal Amarathunge ⚕️</a>
@@ -915,6 +966,64 @@
         list.innerHTML = items || "<li>No pending surgeries</li>";
       });
   }
+
+  function showAngioplastyOptions() {
+    document.getElementById("dashboard-section").classList.add("hidden");
+    document.getElementById("angioplasty-options-section").classList.remove("hidden");
+}
+
+function showBrowseAngioplasty() {
+    document.getElementById("angioplasty-options-section").classList.add("hidden");
+    document.getElementById("browse-angioplasty-section").classList.remove("hidden");
+    loadAngioplastyData();
+}
+
+function loadAngioplastyData() {
+    const tbody = document.getElementById("angioplastyTableBody");
+    tbody.innerHTML = "<tr><td colspan='9'>Loading...</td></tr>";
+    db.collection("surgeryData").orderBy("timestamp", "desc").get().then(snapshot => {
+        let rows = "";
+        snapshot.forEach(doc => {
+            const d = doc.data();
+            rows += `
+                <tr>
+                    <td>${d.name || ""}</td>
+                    <td>${d.age || ""}</td>
+                    <td>${d.sex || ""}</td>
+                    <td>${d.affectedLimb || ""}</td>
+                    <td>${d.angioplastySegments?.join(", ") || ""}</td>
+                    <td>${d.angioplastyDate || ""}</td>
+                    <td>${d.radiologicalSuccess || ""}</td>
+                    <td>${d.woundHealed || ""}</td>
+                    <td><button onclick="editAngioplasty('${doc.id}')">Edit</button></td>
+                </tr>`;
+        });
+        tbody.innerHTML = rows || "<tr><td colspan='9'>No angioplasty data found.</td></tr>";
+    });
+}
+
+function filterAngioplasty() {
+    const input = document.getElementById("angioSearchInput").value.toLowerCase();
+    document.querySelectorAll("#angioplastyTableBody tr").forEach(row => {
+        const name = row.cells[0].innerText.toLowerCase();
+        row.style.display = name.includes(input) ? "" : "none";
+    });
+}
+
+function downloadAngioplastyExcel() {
+    const rows = [["Name", "Age", "Sex", "Affected Limb", "Angioplasty Segments", "Date", "Success", "Wound Healed"]];
+    document.querySelectorAll("#angioplastyTableBody tr").forEach(tr => {
+        const row = [];
+        tr.querySelectorAll("td").forEach((td, index) => {
+            if(index < 8) row.push(td.innerText); // Skip actions column
+        });
+        rows.push(row);
+    });
+    const worksheet = XLSX.utils.aoa_to_sheet(rows);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Angioplasty Data");
+    XLSX.writeFile(workbook, "angioplasty_data.xlsx");
+}
 </script>
 
 </body>
