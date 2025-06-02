@@ -364,7 +364,7 @@
     <div class="container">
       <div class="header">
         <h1 class="clinic-title">Vascular and Transplant Surgery Unit - CNTH</h1>
-        <p class="clinic-subtitle">Comprehensive patient management system</p>
+        <p class="clinic-subtitle">Online Patient Management Portal</p>
       </div>
 
       <div class="dashboard-actions">
@@ -388,7 +388,14 @@
   <p class="action-description">Document and analyze angioplasty outcomes</p>
   <button class="action-button">Access</button>
 </div>
+        <div class="action-card" onclick="showPendingSurgeries()">
+    <div class="action-icon">⏳</div>
+    <h3 class="action-title">Pending Surgeries</h3>
+    <p class="action-description">View pending/uncompleted surgeries</p>
+    <button class="action-button">View</button>
+        </div>
       </div>
+    
 
       <div class="logout-container">
         <button class="logout-button" onclick="logout()">Logout</button>
@@ -674,6 +681,25 @@
   <button onclick="downloadAngioplastyExcel()">Download Excel</button>
   <button class="back-btn" onclick="showAngioplastyOptions()">Back to Options</button>
 </div>
+  <!-- Pending Surgeries Section -->
+<div class="container hidden" id="pending-surgeries-section">
+  <h3>Pending Surgeries</h3>
+  
+  <div style="overflow-x: auto; margin: 1rem 0;">
+    <table>
+      <thead>
+        <tr>
+          <th>Surgery Type</th>
+          <th>Pending Count</th>
+        </tr>
+      </thead>
+      <tbody id="pendingSurgeriesTableBody"></tbody>
+    </table>
+  </div>
+  
+  <button class="back-btn" onclick="backToDashboard()">Back to Dashboard</button>
+</div>
+  
 
   <footer>
     Made by <a href="https://dryomal.com" target="_blank">Dr. Yomal Amarathunge ⚕️</a>
@@ -763,16 +789,74 @@
   }
 
   function backToDashboard() {
-    // Hide all sections
-    document.getElementById("form-section").classList.add("hidden");
-    document.getElementById("browse-section").classList.add("hidden");
-    document.getElementById("surgery-data-section").classList.add("hidden");
-    document.getElementById("angioplasty-options-section").classList.add("hidden");
-    document.getElementById("browse-angioplasty-section").classList.add("hidden");
-    
-    // Show dashboard
-    document.getElementById("dashboard-section").classList.remove("hidden");
+  // Hide all sections
+  document.getElementById("form-section").classList.add("hidden");
+  document.getElementById("browse-section").classList.add("hidden");
+  document.getElementById("surgery-data-section").classList.add("hidden");
+  document.getElementById("angioplasty-options-section").classList.add("hidden");
+  document.getElementById("browse-angioplasty-section").classList.add("hidden");
+  document.getElementById("pending-surgeries-section").classList.add("hidden");
+  
+  // Show dashboard
+  document.getElementById("dashboard-section").classList.remove("hidden");
   }
+  function showPendingSurgeries() {
+  // Hide other sections
+  document.getElementById("dashboard-section").classList.add("hidden");
+  document.getElementById("form-section").classList.add("hidden");
+  document.getElementById("browse-section").classList.add("hidden");
+  document.getElementById("surgery-data-section").classList.add("hidden");
+  document.getElementById("angioplasty-options-section").classList.add("hidden");
+  document.getElementById("browse-angioplasty-section").classList.add("hidden");
+  
+  // Show pending surgeries section
+  document.getElementById("pending-surgeries-section").classList.remove("hidden");
+  loadPendingSurgeries();
+}
+
+function loadPendingSurgeries() {
+  const tbody = document.getElementById("pendingSurgeriesTableBody");
+  tbody.innerHTML = "<tr><td colspan='2'>Loading...</td></tr>";
+  
+  db.collection("patients").get().then(snapshot => {
+    const surgeryCounts = {};
+    
+    // Count completed and total surgeries by type
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const surgeryType = data.plannedSurgery;
+      const isCompleted = data.surgeryCompleted === "Yes";
+      
+      if (surgeryType) {
+        if (!surgeryCounts[surgeryType]) {
+          surgeryCounts[surgeryType] = {
+            total: 0,
+            completed: 0
+          };
+        }
+        surgeryCounts[surgeryType].total++;
+        if (isCompleted) {
+          surgeryCounts[surgeryType].completed++;
+        }
+      }
+    });
+    
+    // Generate table rows
+    let rows = "";
+    for (const [surgeryType, counts] of Object.entries(surgeryCounts)) {
+      const pendingCount = counts.total - counts.completed;
+      if (pendingCount > 0) {
+        rows += `
+          <tr>
+            <td>${surgeryType}</td>
+            <td>${pendingCount}</td>
+          </tr>`;
+      }
+    }
+    
+    tbody.innerHTML = rows || "<tr><td colspan='2'>No pending surgeries found</td></tr>";
+  });
+}
 
   function submitPatient() {
     const id = document.getElementById("patientId").value;
