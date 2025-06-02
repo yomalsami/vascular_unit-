@@ -750,16 +750,24 @@
   }
 
   function showSurgeryDataForm() {
+    // Hide other sections
     document.getElementById("dashboard-section").classList.add("hidden");
-    document.getElementById("form-section").classList.add("hidden");
-    document.getElementById("browse-section").classList.add("hidden");
+    document.getElementById("angioplasty-options-section").classList.add("hidden");
+    document.getElementById("browse-angioplasty-section").classList.add("hidden");
+    
+    // Show form
     document.getElementById("surgery-data-section").classList.remove("hidden");
   }
 
   function backToDashboard() {
+    // Hide all sections
     document.getElementById("form-section").classList.add("hidden");
     document.getElementById("browse-section").classList.add("hidden");
     document.getElementById("surgery-data-section").classList.add("hidden");
+    document.getElementById("angioplasty-options-section").classList.add("hidden");
+    document.getElementById("browse-angioplasty-section").classList.add("hidden");
+    
+    // Show dashboard
     document.getElementById("dashboard-section").classList.remove("hidden");
   }
 
@@ -968,12 +976,23 @@
   }
 
   function showAngioplastyOptions() {
+    // Hide all other sections
     document.getElementById("dashboard-section").classList.add("hidden");
+    document.getElementById("form-section").classList.add("hidden");
+    document.getElementById("browse-section").classList.add("hidden");
+    document.getElementById("surgery-data-section").classList.add("hidden");
+    document.getElementById("browse-angioplasty-section").classList.add("hidden");
+    
+    // Show options
     document.getElementById("angioplasty-options-section").classList.remove("hidden");
-}
+  }
 
 function showBrowseAngioplasty() {
+    // Hide other sections
     document.getElementById("angioplasty-options-section").classList.add("hidden");
+    document.getElementById("surgery-data-section").classList.add("hidden");
+    
+    // Show browse section
     document.getElementById("browse-angioplasty-section").classList.remove("hidden");
     loadAngioplastyData();
 }
