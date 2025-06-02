@@ -432,8 +432,11 @@
       <label>Date of Surgery</label>
       <input type="date" id="dateOfSurgery">
       
-      <label>Surgeon</label>
-      <input type="text" id="surgeon">
+      <label>Surgery Completed</label>
+  <select id="surgeryCompleted">
+    <option value="No">No</option>
+    <option value="Yes">Yes</option>
+  </select>
     </div>
     
     <div class="form-section">
@@ -465,7 +468,7 @@
             <th>Diagnosis</th>
             <th>Planned Surgery</th>
             <th>Date of Surgery</th>
-            <th>Surgeon</th>
+            <th>Completed</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -781,7 +784,7 @@
       interventions: document.getElementById("interventions").value,
       plannedSurgery: document.getElementById("plannedSurgery").value,
       dateOfSurgery: document.getElementById("dateOfSurgery").value,
-      surgeon: document.getElementById("surgeon").value,
+      surgeon: document.getElementById("surgeryCompleted").value,
       contact: document.getElementById("contact").value,
       notes: document.getElementById("notes").value,
       timestamp: new Date()
@@ -910,7 +913,7 @@
             <td>${d.diagnosis || ""}</td>
             <td>${d.plannedSurgery || ""}</td>
             <td>${d.dateOfSurgery || ""}</td>
-            <td>${d.surgeon || ""}</td>
+            <td>${d.surgeryCompleted || "No"}</td>
             <td><button onclick="editPatient('${doc.id}')">Edit</button></td>
           </tr>`;
       });
@@ -929,7 +932,7 @@
       document.getElementById("interventions").value = d.interventions || "";
       document.getElementById("plannedSurgery").value = d.plannedSurgery || "";
       document.getElementById("dateOfSurgery").value = d.dateOfSurgery || "";
-      document.getElementById("surgeon").value = d.surgeon || "";
+      document.getElementById("surgeryCompleted").value = d.surgeryCompleted || "No";
       document.getElementById("contact").value = d.contact || "";
       document.getElementById("notes").value = d.notes || "";
 
@@ -946,7 +949,7 @@
   }
 
   function downloadExcel() {
-    const rows = [["Name", "Age", "Gender", "Diagnosis", "Interventions", "Visit Date", "Stay", "Contact", "Notes", "Planned Surgery", "Date of Surgery", "Surgeon"]];
+    const rows = [["Name", "Age", "Gender", "Diagnosis", "Interventions", "Visit Date", "Stay", "Contact", "Notes", "Planned Surgery", "Date of Surgery", "Surgery Completed"]];
     document.querySelectorAll("#patientTableBody tr").forEach(tr => {
       const row = [];
       tr.querySelectorAll("td").forEach(td => row.push(td.innerText));
