@@ -609,6 +609,115 @@
         <input type="number" id="healing-time">
       </div>
 
+    
+  
+  <label>Did you require amputation?</label>
+  <div class="checkbox-group">
+    <div class="checkbox-option">
+      <input type="radio" name="amputation" id="amputation-yes" value="Yes" onchange="toggleAmputationDetails()">
+      <label for="amputation-yes">Yes</label>
+    </div>
+    <div class="checkbox-option">
+      <input type="radio" name="amputation" id="amputation-no" value="No" onchange="toggleAmputationDetails()">
+      <label for="amputation-no">No</label>
+    </div>
+  </div>
+  
+  <div id="amputation-details" class="hidden">
+    <label>Type of amputation:</label>
+    <div class="checkbox-group">
+      <div class="checkbox-option">
+        <input type="radio" name="amputation-type" id="amputation-toe" value="Toe">
+        <label for="amputation-toe">Toe</label>
+      </div>
+      <div class="checkbox-option">
+        <input type="radio" name="amputation-type" id="amputation-forefoot" value="Forefoot">
+        <label for="amputation-forefoot">Forefoot</label>
+      </div>
+      <div class="checkbox-option">
+        <input type="radio" name="amputation-type" id="amputation-bka" value="BKA">
+        <label for="amputation-bka">Below Knee (BKA)</label>
+      </div>
+      <div class="checkbox-option">
+        <input type="radio" name="amputation-type" id="amputation-aka" value="AKA">
+        <label for="amputation-aka">Above Knee (AKA)</label>
+      </div>
+    </div>
+  </div>
+  
+  <label>Were you mobile after the procedure?</label>
+  <div class="checkbox-group">
+    <div class="checkbox-option">
+      <input type="radio" name="mobility-after" id="mobility-independent" value="Independently">
+      <label for="mobility-independent">Independently</label>
+    </div>
+    <div class="checkbox-option">
+      <input type="radio" name="mobility-after" id="mobility-aid" value="With walking aid">
+      <label for="mobility-aid">With walking aid</label>
+    </div>
+    <div class="checkbox-option">
+      <input type="radio" name="mobility-after" id="mobility-wheelchair" value="Wheelchair-bound">
+      <label for="mobility-wheelchair">Wheelchair-bound</label>
+    </div>
+    <div class="checkbox-option">
+      <input type="radio" name="mobility-after" id="mobility-bedridden" value="Bedridden">
+      <label for="mobility-bedridden">Bedridden</label>
+    </div>
+  </div>
+  
+  <label>Current mobility status:</label>
+  <div class="checkbox-group">
+    <div class="checkbox-option">
+      <input type="radio" name="current-mobility" id="mobility-fully" value="Fully mobile">
+      <label for="mobility-fully">Fully mobile</label>
+    </div>
+    <div class="checkbox-option">
+      <input type="radio" name="current-mobility" id="mobility-partially" value="Partially mobile">
+      <label for="mobility-partially">Partially mobile</label>
+    </div>
+    <div class="checkbox-option">
+      <input type="radio" name="current-mobility" id="mobility-dependent" value="Dependent for ADLs">
+      <label for="mobility-dependent">Dependent for activities of daily living (ADLs)</label>
+    </div>
+  </div>
+  
+  <label>Do you wear offloading footwear as advised?</label>
+  <div class="checkbox-group">
+    <div class="checkbox-option">
+      <input type="radio" name="footwear" id="footwear-always" value="Yes always">
+      <label for="footwear-always">Yes always</label>
+    </div>
+    <div class="checkbox-option">
+      <input type="radio" name="footwear" id="footwear-sometimes" value="Sometimes">
+      <label for="footwear-sometimes">Sometimes</label>
+    </div>
+    <div class="checkbox-option">
+      <input type="radio" name="footwear" id="footwear-no" value="No">
+      <label for="footwear-no">No</label>
+    </div>
+  </div>
+  
+  <label>Have you experienced:</label>
+  <div class="checkbox-group">
+    <div class="checkbox-option">
+      <input type="checkbox" id="new-ulcers" value="New ulcers">
+      <label for="new-ulcers">New ulcers</label>
+    </div>
+    <div class="checkbox-option">
+      <input type="checkbox" id="pain-at-rest" value="Pain at rest">
+      <label for="pain-at-rest">Pain at rest</label>
+    </div>
+    <div class="checkbox-option">
+      <input type="checkbox" id="hospital-admission" value="Hospital admission" onchange="toggleAdmissionReason()">
+      <label for="hospital-admission">Any hospital admission after angioplasty</label>
+    </div>
+    <div id="admission-reason" class="hidden">
+      <label>If yes, why?</label>
+      <input type="text" id="admission-reason-text">
+    </div>
+  </div>
+    
+
       <label>Did you require following intervention after first intervention?</label>
       <div class="checkbox-group">
         <div class="checkbox-option"><input type="checkbox" id="repeat-angio" value="Repeat angioplasty"> <label for="repeat-angio">Repeat angioplasty</label></div>
@@ -948,6 +1057,25 @@ function loadPendingSurgeries() {
     if (document.getElementById("stenting").checked) postInterventions.push("Stenting");
     if (document.getElementById("bypass-surgery").checked) postInterventions.push("Bypass surgery");
 
+    // Get amputation data
+  const amputation = document.querySelector('input[name="amputation"]:checked')?.value || '';
+  const amputationType = document.querySelector('input[name="amputation-type"]:checked')?.value || '';
+  
+  // Get mobility data
+  const mobilityAfter = document.querySelector('input[name="mobility-after"]:checked')?.value || '';
+  const currentMobility = document.querySelector('input[name="current-mobility"]:checked')?.value || '';
+  const footwear = document.querySelector('input[name="footwear"]:checked')?.value || '';
+  
+  // Get complications
+  const complications = [];
+  if (document.getElementById("new-ulcers").checked) complications.push("New ulcers");
+  if (document.getElementById("pain-at-rest").checked) complications.push("Pain at rest");
+  if (document.getElementById("hospital-admission").checked) complications.push("Hospital admission");
+  
+  const admissionReason = document.getElementById("hospital-admission").checked 
+    ? document.getElementById("admission-reason-text").value 
+    : '';
+
     const data = {
       // Patient Information
       name: document.getElementById("surgery-name").value,
@@ -983,6 +1111,13 @@ function loadPendingSurgeries() {
                   parseInt(document.getElementById("healing-time").value) : null,
       postInterventions: postInterventions,
       satisfaction: document.querySelector('input[name="satisfaction"]:checked')?.value || '',
+      amputation: amputation,
+    amputationType: amputationType,
+    mobilityAfter: mobilityAfter,
+    currentMobility: currentMobility,
+    footwear: footwear,
+    complications: complications,
+    admissionReason: admissionReason,
       
       timestamp: new Date()
     };
@@ -998,6 +1133,15 @@ function loadPendingSurgeries() {
         document.getElementById("surgery-submit-message").innerText = err.message;
       });
   }
+  function toggleAmputationDetails() {
+  const amputationYes = document.getElementById("amputation-yes").checked;
+  document.getElementById("amputation-details").classList.toggle("hidden", !amputationYes);
+}
+
+function toggleAdmissionReason() {
+  const admissionChecked = document.getElementById("hospital-admission").checked;
+  document.getElementById("admission-reason").classList.toggle("hidden", !admissionChecked);
+}
 
   function loadPatients() {
     const tbody = document.getElementById("patientTableBody");
