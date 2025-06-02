@@ -819,32 +819,48 @@ function loadPendingSurgeries() {
   tbody.innerHTML = "<tr><td colspan='2'>Loading...</td></tr>";
   
   db.collection("patients").get().then(snapshot => {
-    const surgeryCounts = {};
+    const surgeryStats = {};
     
-    // Count completed and total surgeries by type
+    // Process all patient records
     snapshot.forEach(doc => {
-      const data = doc.data();
-      const surgeryType = data.plannedSurgery;
-      const isCompleted = data.surgeryCompleted === "Yes";
+      const patient = doc.data();
+      const surgeryType = patient.plannedSurgery;
       
+      // Only process records with planned surgery
       if (surgeryType) {
-        if (!surgeryCounts[surgeryType]) {
-          surgeryCounts[surgeryType] = {
+        // Initialize surgery type if not exists
+        if (!surgeryStats[surgeryType]) {
+          surgeryStats[surgeryType] = {
             total: 0,
             completed: 0
           };
         }
-        surgeryCounts[surgeryType].total++;
-        if (isCompleted) {
-          surgeryCounts[surgeryType].completed++;
+        
+        // Count all surgeries of this type
+        surgeryStats[surgeryType].total++;
+        
+        // Count completed surgeries
+        if (patient.surgeryCompleted === "Yes") {
+          surgeryStats[surgeryType].completed++;
         }
       }
+      db.collection("patients").get().then(snapshot => {
+    console.log("Total patient records:", snapshot.size); // Debug log
+    
+    snapshot.forEach(doc => {
+      console.log("Patient data:", doc.id, doc.data()); // Debug log
+      // ... rest of the processing code ...
     });
     
-    // Generate table rows
-    let rows = "";
-    for (const [surgeryType, counts] of Object.entries(surgeryCounts)) {
-      const pendingCount = counts.total - counts.completed;
+    console.log("Surgery statistics:", surgeryStats); // Debug log
+    });
+    
+    // Generate table rows for pending surgeries
+    let rows = '';
+    Object.entries(surgeryStats).forEach(([surgeryType, stats]) => {
+      const pendingCount = stats.total - stats.completed;
+      
+      // Only show surgeries with pending cases
       if (pendingCount > 0) {
         rows += `
           <tr>
@@ -852,9 +868,14 @@ function loadPendingSurgeries() {
             <td>${pendingCount}</td>
           </tr>`;
       }
-    }
+    });
     
-    tbody.innerHTML = rows || "<tr><td colspan='2'>No pending surgeries found</td></tr>";
+    // Display results or "no data" message
+    tbody.innerHTML = rows || '<tr><td colspan="2">No pending surgeries found</td></tr>';
+    
+  }).catch(error => {
+    console.error("Error loading pending surgeries:", error);
+    tbody.innerHTML = `<tr><td colspan="2">Error loading data</td></tr>`;
   });
 }
 
