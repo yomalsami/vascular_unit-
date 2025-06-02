@@ -816,6 +816,11 @@
 
 function loadPendingSurgeries() {
   const tbody = document.getElementById("pendingSurgeriesTableBody");
+  if (!tbody) {
+    console.error("Error: Could not find pending surgeries table body");
+    return;
+  }
+  
   tbody.innerHTML = "<tr><td colspan='2'>Loading...</td></tr>";
   
   db.collection("patients").get().then(snapshot => {
@@ -844,17 +849,6 @@ function loadPendingSurgeries() {
           surgeryStats[surgeryType].completed++;
         }
       }
-      db.collection("patients").get().then(snapshot => {
-    console.log("Total patient records:", snapshot.size); // Debug log
-    
-    snapshot.forEach(doc => {
-      console.log("Patient data:", doc.id, doc.data()); // Debug log
-      // ... rest of the processing code ...
-    });
-    
-    console.log("Surgery statistics:", surgeryStats); // Debug log
-    });
-
     });
     
     // Generate table rows for pending surgeries
@@ -877,7 +871,7 @@ function loadPendingSurgeries() {
     
   }).catch(error => {
     console.error("Error loading pending surgeries:", error);
-    tbody.innerHTML = `<tr><td colspan="2">Error loading data</td></tr>`;
+    tbody.innerHTML = '<tr><td colspan="2">Error loading data</td></tr>';
   });
 }
 
@@ -1068,22 +1062,7 @@ function loadPendingSurgeries() {
     XLSX.writeFile(workbook, "patients.xlsx");
   }
 
-  function loadPendingSurgeries() {
-    const list = document.getElementById("surgeryList");
-    list.innerHTML = "<li>Loading...</li>";
-    db.collection("patients")
-      .where("plannedSurgery", "!=", "")
-      .orderBy("plannedSurgery")
-      .get()
-      .then(snapshot => {
-        let items = "";
-        snapshot.forEach(doc => {
-          const d = doc.data();
-          items += `<li>${d.name} - ${d.plannedSurgery} on ${d.dateOfSurgery || "TBA"}</li>`;
-        });
-        list.innerHTML = items || "<li>No pending surgeries</li>";
-      });
-  }
+  
 
   function showAngioplastyOptions() {
     // Hide all other sections
