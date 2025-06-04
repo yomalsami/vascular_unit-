@@ -801,21 +801,23 @@
   
   <div style="overflow-x: auto; margin: 1rem 0;">
     <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>BHT</th>
-          <th>Age</th>
-          <th>Sex</th>
-          <th>Affected Limb</th>
-          <th>Angioplasty Segments</th>
-          <th>Date</th>
-          <th>Success</th>
-          <th>Wound Healed</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="angioplastyTableBody"></tbody>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>BHT</th>
+      <th>Age</th>
+      <th>Sex</th>
+      <th>Affected Limb</th>
+      <th>Angioplasty Segments</th>
+      <th>Amputation</th>
+      <th>AFS Period</th> <!-- New column -->
+      <th>Date</th>
+      <th>Success</th>
+      <th>Wound Healed</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody id="angioplastyTableBody"></tbody>
     </table>
   </div>
   
@@ -1266,7 +1268,7 @@ function showBrowseAngioplasty() {
 
 function loadAngioplastyData() {
     const tbody = document.getElementById("angioplastyTableBody");
-    tbody.innerHTML = "<tr><td colspan='9'>Loading...</td></tr>";
+    tbody.innerHTML = "<tr><td colspan='12'>Loading...</td></tr>";
     db.collection("surgeryData").orderBy("timestamp", "desc").get().then(snapshot => {
         let rows = "";
         snapshot.forEach(doc => {
@@ -1280,14 +1282,14 @@ function loadAngioplastyData() {
                     <td>${d.affectedLimb || ""}</td>
                     <td>${d.angioplastySegments?.join(", ") || ""}</td>
                     <td>${d.amputation || "No"} ${d.amputationType ? `(${d.amputationType})` : ""}</td>
-                    <td>${d.afsPeriod || ""}</td>
+                    <td>${d.afsPeriod || ""}</td> <!-- New field -->
                     <td>${d.angioplastyDate || ""}</td>
                     <td>${d.radiologicalSuccess || ""}</td>
                     <td>${d.woundHealed || ""}</td>
                     <td><button onclick="editAngioplasty('${doc.id}')">Edit</button></td>
                 </tr>`;
         });
-        tbody.innerHTML = rows || "<tr><td colspan='9'>No angioplasty data found.</td></tr>";
+        tbody.innerHTML = rows || "<tr><td colspan='12'>No angioplasty data found.</td></tr>";
     });
 }
 
@@ -1300,19 +1302,73 @@ function filterAngioplasty() {
 }
 
 function downloadAngioplastyExcel() {
-    const rows = [["Name", "BHT", "Age", "Sex", "Affected Limb", "Angioplasty Segments", "Amputation", "AFS Period", "Date", "Success", "Wound Healed"]];
+    const rows = [[
+        "Name", "BHT", "Age", "Sex", "Affected Limb", 
+        "Angioplasty Segments", "Amputation", "Amputation Type",
+        "AFS Period", "Date", "Success", "Wound Healed"
+    ]];
+    
     document.querySelectorAll("#angioplastyTableBody tr").forEach(tr => {
         const row = [];
-        tr.querySelectorAll("td").forEach((td, index) => {
-            if(index < 8) row.push(td.innerText); // Skip actions column
-        });
+        // Basic info
+        row.push(tr.cells[0].innerText); // Name
+        row.push(tr.cells[1].innerText); // BHT
+        row.push(tr.cells[2].innerText); // Age
+        row.push(tr.cells[3].innerText); // Sex
+        row.push(tr.cells[4].innerText); // Affected Limb
+        row.push(tr.cells[5].innerText); // Angioplasty Segments
+        
+        // Amputation info (combined in display but separate in Excel)
+        const amputationText = tr.cells[6].innerText;
+        const amputationParts = amputationText.split(' (');
+        row.push(amputationParts[0]); // Yes/No
+        row.push(amputationParts.length > 1 ? amputationParts[1].replace(')', '') : ''); // Type
+        
+        // AFS Period
+        row.push(tr.cells[7].innerText);
+        
+        // Rest of the data
+        row.push(tr.cells[8].innerText); // Date
+        row.push(tr.cells[9].innerText); // Success
+        row.push(tr.cells[10].innerText); // Wound Healed
+        
         rows.push(row);
     });
+    
     const worksheet = XLSX.utils.aoa_to_sheet(rows);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Angioplasty Data");
     XLSX.writeFile(workbook, "angioplasty_data.xlsx");
 }
+  function editAngioplasty(id) {
+    db.collection("surgeryData").doc(id).get().then(doc => {
+        const d = doc.data();
+        
+        // Basic patient info
+        document.getElementById("surgery-name").value = d.name || "";
+        document.getElementById("bht").value = d.bht || "";
+        document.getElementById("surgery-age").value = d.age || "";
+        document.getElementById("surgery-sex").value = d.sex || "";
+        document.getElementById("surgery-phone").value = d.phone || "";
+        
+        // Amputation and AFS Period
+        if (d.amputation === "Yes") {
+            document.getElementById("amputation-yes").checked = true;
+            document.getElementById(`amputation-${d.amputationType?.toLowerCase()}`).checked = true;
+        } else {
+            document.getElementById("amputation-no").checked = true;
+        }
+        
+        if (d.afsPeriod) {
+            document.querySelector(`input[name="afs-period"][value="${d.afsPeriod}"]`).checked = true;
+        }
+        
+        // Show the form
+        showSurgeryDataForm();
+    }).catch(error => {
+        console.error("Error loading angioplasty data:", error);
+    });
+  }
 </script>
 
 </body>
