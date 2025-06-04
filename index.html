@@ -496,6 +496,9 @@
       <label>Name</label>
       <input type="text" id="surgery-name">
       
+      <label>BHT Number</label>
+      <input type="text" id="bht">
+      
       <label>Age</label>
       <input type="number" id="surgery-age">
       
@@ -773,6 +776,7 @@
       <thead>
         <tr>
           <th>Name</th>
+          <th>BHT</th>
           <th>Age</th>
           <th>Sex</th>
           <th>Affected Limb</th>
@@ -1079,6 +1083,7 @@ function loadPendingSurgeries() {
     const data = {
       // Patient Information
       name: document.getElementById("surgery-name").value,
+      bht:document.getElementById("bht").value,
       age: parseInt(document.getElementById("surgery-age").value),
       sex: document.getElementById("surgery-sex").value,
       phone: document.getElementById("surgery-phone").value,
@@ -1240,6 +1245,7 @@ function loadAngioplastyData() {
             rows += `
                 <tr>
                     <td>${d.name || ""}</td>
+                    <td>${d.bht || ""}</td>
                     <td>${d.age || ""}</td>
                     <td>${d.sex || ""}</td>
                     <td>${d.affectedLimb || ""}</td>
@@ -1263,7 +1269,7 @@ function filterAngioplasty() {
 }
 
 function downloadAngioplastyExcel() {
-    const rows = [["Name", "Age", "Sex", "Affected Limb", "Angioplasty Segments", "Date", "Success", "Wound Healed"]];
+    const rows = [["Name", "BHT", "Age", "Sex", "Affected Limb", "Angioplasty Segments", "Date", "Success", "Wound Healed"]];
     document.querySelectorAll("#angioplastyTableBody tr").forEach(tr => {
         const row = [];
         tr.querySelectorAll("td").forEach((td, index) => {
