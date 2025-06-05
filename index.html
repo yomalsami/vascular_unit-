@@ -1414,58 +1414,81 @@ function downloadAngioplastyExcel() {
         const d = doc.data();
         document.getElementById("angioplastyId").value = id;
         
+        // Helper function to safely set values
+        function setValue(id, value) {
+            const element = document.getElementById(id);
+            if (element) element.value = value || "";
+        }
+
+        // Helper function to safely check radio buttons
+        function checkRadio(name, value) {
+            const radio = document.querySelector(`input[name="${name}"][value="${value}"]`);
+            if (radio) radio.checked = true;
+        }
+
+        // Helper function to safely check checkboxes
+        function checkCheckbox(id, shouldCheck) {
+            const checkbox = document.getElementById(id);
+            if (checkbox) checkbox.checked = shouldCheck;
+        }
+
         // Basic patient info
-        document.getElementById("surgery-name").value = d.name || "";
-        document.getElementById("bht").value = d.bht || "";
-        document.getElementById("surgery-age").value = d.age || "";
-        document.getElementById("surgery-sex").value = d.sex || "";
-        document.getElementById("surgery-phone").value = d.phone || "";
+        setValue("surgery-name", d.name);
+        setValue("bht", d.bht);
+        setValue("surgery-age", d.age);
+        setValue("surgery-sex", d.sex);
+        setValue("surgery-phone", d.phone);
         
         // Lifestyle factors
-        document.querySelector(`input[name="smoking"][value="${d.smokingHistory}"]`).checked = true;
-        if (d.smokingHistory === 'Current') {
-            document.getElementById("cigarettes-per-day").value = d.cigarettesPerDay || "";
-            document.getElementById("smoking-duration").value = d.smokingDuration || "";
-        }
-        document.querySelector(`input[name="alcohol"][value="${d.alcoholUse}"]`).checked = true;
+        checkRadio("smoking", d.smokingHistory);
+        setValue("cigarettes-per-day", d.cigarettesPerDay);
+        setValue("smoking-duration", d.smokingDuration);
+        checkRadio("alcohol", d.alcoholUse);
         
         // Medical history checkboxes
-        ['diabetes', 'hypertension', 'ihd', 'ckd', 'stroke', 'heart-failure', 'hyperlipidemia', 'previous-surgery'].forEach(condition => {
-            document.getElementById(condition).checked = d.medicalConditions?.includes(document.getElementById(condition).value) || false;
-        });
+        checkCheckbox("diabetes", d.medicalConditions?.includes("Diabetes Mellitus"));
+        checkCheckbox("hypertension", d.medicalConditions?.includes("Hypertension"));
+        checkCheckbox("ihd", d.medicalConditions?.includes("Ischemic Heart Disease"));
+        checkCheckbox("ckd", d.medicalConditions?.includes("Chronic Kidney Disease"));
+        checkCheckbox("stroke", d.medicalConditions?.includes("History of Stroke"));
+        checkCheckbox("heart-failure", d.medicalConditions?.includes("Heart Failure"));
+        checkCheckbox("hyperlipidemia", d.medicalConditions?.includes("Hyperlipidemia"));
+        checkCheckbox("previous-surgery", d.medicalConditions?.includes("Previous lower limb surgery or angioplasty"));
+        setValue("previous-surgery-text", d.previousSurgeryDetails);
         
-        // Medications checkboxes
-        ['aspirin', 'clopidogrel', 'statins', 'insulin', 'metformin', 'other-meds'].forEach(med => {
-            document.getElementById(med).checked = d.medications?.includes(document.getElementById(med).value) || false;
-        });
+        // Medications
+        checkCheckbox("aspirin", d.medications?.includes("Aspirin"));
+        checkCheckbox("clopidogrel", d.medications?.includes("Clopidogrel"));
+        checkCheckbox("statins", d.medications?.includes("Statins"));
+        checkCheckbox("insulin", d.medications?.includes("Insulin"));
+        checkCheckbox("metformin", d.medications?.includes("Metformin"));
+        checkCheckbox("other-meds", d.otherMedications);
+        setValue("other-meds-text", d.otherMedications);
         
         // Procedure details
-        document.getElementById("surgery-limb").value = d.affectedLimb || "";
-        ['sfa', 'popliteal', 'pta', 'ata', 'tpt', 'peroneal'].forEach(segment => {
-            document.getElementById(segment).checked = d.angioplastySegments?.includes(document.getElementById(segment).value) || false;
-        });
-        document.getElementById("surgery-date").value = d.angioplastyDate || "";
-        document.getElementById("surgery-success").value = d.radiologicalSuccess || "";
+        setValue("surgery-limb", d.affectedLimb);
+        checkCheckbox("sfa", d.angioplastySegments?.includes("SFA"));
+        checkCheckbox("popliteal", d.angioplastySegments?.includes("Popliteal"));
+        checkCheckbox("pta", d.angioplastySegments?.includes("PTA"));
+        checkCheckbox("ata", d.angioplastySegments?.includes("ATA"));
+        checkCheckbox("tpt", d.angioplastySegments?.includes("TPT"));
+        checkCheckbox("peroneal", d.angioplastySegments?.includes("Peroneal"));
+        setValue("surgery-date", d.angioplastyDate);
+        setValue("surgery-success", d.radiologicalSuccess);
         
         // Outcomes
-        document.querySelector(`input[name="wound-healed"][value="${d.woundHealed}"]`).checked = true;
-        document.getElementById("healing-time").value = d.healingTime || "";
-        
-        // Amputation data
-        document.querySelector(`input[name="amputation"][value="${d.amputation === 'Yes' ? 'Yes' : 'No'}"]`).checked = true;
+        checkRadio("wound-healed", d.woundHealed);
+        setValue("healing-time", d.healingTime);
+        checkRadio("amputation", d.amputation === "Yes" ? "Yes" : "No");
         if (d.amputationType) {
-            document.querySelector(`input[name="amputation-type"][value="${d.amputationType}"]`).checked = true;
+            checkRadio("amputation-type", d.amputationType);
         }
-        
-        // AFS Period
         if (d.afsPeriod) {
-            document.querySelector(`input[name="afs-period"][value="${d.afsPeriod}"]`).checked = true;
+            checkRadio("afs-period", d.afsPeriod);
         }
         
         // Show the form
-        document.getElementById("angioplasty-options-section").classList.add("hidden");
-        document.getElementById("browse-angioplasty-section").classList.add("hidden");
-        document.getElementById("surgery-data-section").classList.remove("hidden");
+        showSurgeryDataForm();
         
     }).catch(error => {
         console.error("Error loading angioplasty data:", error);
