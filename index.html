@@ -1319,7 +1319,7 @@ function loadAngioplastyData() {
                     <td>${d.angioplastyDate || ""}</td>
                     <td>${d.radiologicalSuccess || ""}</td>
                     <td>${d.woundHealed || ""}</td>
-                    <td><button onclick="event.stopPropagation(); editAngioplasty('${doc.id}')">Edit</button>`<button onclick="deleteAngioplasty('${doc.id}')" style="background-color: #dc3545; margin-top: 5px;">Delete</button></td>
+                    <td><button onclick="event.stopPropagation(); editAngioplasty('${doc.id}')">Edit</button><button onclick="deleteAngioplasty('${doc.id}')" style="background-color: #dc3545; margin-top: 5px;">Delete</button></td>
                 </tr>`;
         });
         tbody.innerHTML = rows || "<tr><td colspan='12'>No angioplasty data found.</td></tr>";
