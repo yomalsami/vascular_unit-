@@ -284,19 +284,7 @@
       background-color: #343a40;
     }
 
-    button[onclick^="delete"] {
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-button[onclick^="delete"]:hover {
-    background-color: #c82333;
-}
+    
 
     /* Tables */
     table {
@@ -505,6 +493,7 @@ button[onclick^="delete"]:hover {
 
 
   <div class="container hidden form-container" id="surgery-data-section">
+    <form id="angioplasty-form" class="form-container">
     <h3>Angioplasty Registry</h3>
     <input type="hidden" id="angioplastyId">
     <div class="form-section">
@@ -805,6 +794,7 @@ button[onclick^="delete"]:hover {
       <p class="action-description">View and analyze angioplasty data</p>
       <button class="action-button">Browse</button>
     </div>
+  </form>
   </div>
 
   <button class="back-btn" onclick="backToDashboard()">Back to Dashboard</button>
@@ -1077,6 +1067,8 @@ function loadPendingSurgeries() {
 
   function submitSurgeryData() {
     // Get all selected medical conditions
+    const form = document.getElementById("angioplasty-form");
+    const id = document.getElementById("angioplastyId").value;
     const conditions = [];
     document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked').forEach(checkbox => {
       if (checkbox.id === 'diabetes' || checkbox.id === 'hypertension' || checkbox.id === 'ihd' || 
@@ -1128,7 +1120,7 @@ function loadPendingSurgeries() {
   const admissionReason = document.getElementById("hospital-admission").checked 
     ? document.getElementById("admission-reason-text").value 
     : '';
-  const id = document.getElementById("angioplastyId").value;
+  
 
     const data = {
       // Patient Information
@@ -1183,25 +1175,28 @@ function loadPendingSurgeries() {
         // Update existing document
         db.collection("surgeryData").doc(id).update(data)
             .then(() => {
-                document.getElementById("surgery-submit-message").innerText = "Data updated successfully!";
-                // Clear the form and ID
+                alert("Data updated successfully!");
                 document.getElementById("angioplastyId").value = "";
-                document.getElementById("surgery-data-section").reset();
+                form.reset();
+                backToDashboard();
             })
             .catch(err => {
-                document.getElementById("surgery-submit-message").innerText = err.message;
+                console.error("Error updating document: ", err);
+                alert("Error updating data: " + err.message);
             });
     } else {
         // Add new document
         db.collection("surgeryData").add(data)
             .then(() => {
-                document.getElementById("surgery-submit-message").innerText = "Data submitted successfully!";
-                document.getElementById("surgery-data-section").reset();
+                alert("Data submitted successfully!");
+                form.reset();
+                backToDashboard();
             })
             .catch(err => {
-                document.getElementById("surgery-submit-message").innerText = err.message;
+                console.error("Error adding document: ", err);
+                alert("Error submitting data: " + err.message);
             });
-       }
+    }
   }
   function toggleAmputationDetails() {
   const amputationYes = document.getElementById("amputation-yes").checked;
@@ -1389,8 +1384,13 @@ function downloadAngioplastyExcel() {
 }
   function editAngioplasty(id) {
     db.collection("surgeryData").doc(id).get().then(doc => {
+        if (!doc.exists) {
+            alert("No such document!");
+            return;
+        }
+
         const d = doc.data();
-      document.getElementById("angioplastyId").value = id;
+        document.getElementById("angioplastyId").value = id;
         
         // Basic patient info
         document.getElementById("surgery-name").value = d.name || "";
@@ -1399,24 +1399,57 @@ function downloadAngioplastyExcel() {
         document.getElementById("surgery-sex").value = d.sex || "";
         document.getElementById("surgery-phone").value = d.phone || "";
         
-        // Amputation and AFS Period
-        if (d.amputation === "Yes") {
-            document.getElementById("amputation-yes").checked = true;
-            document.getElementById(`amputation-${d.amputationType?.toLowerCase()}`).checked = true;
-        } else {
-            document.getElementById("amputation-no").checked = true;
+        // Lifestyle factors
+        document.querySelector(`input[name="smoking"][value="${d.smokingHistory}"]`).checked = true;
+        if (d.smokingHistory === 'Current') {
+            document.getElementById("cigarettes-per-day").value = d.cigarettesPerDay || "";
+            document.getElementById("smoking-duration").value = d.smokingDuration || "";
+        }
+        document.querySelector(`input[name="alcohol"][value="${d.alcoholUse}"]`).checked = true;
+        
+        // Medical history checkboxes
+        ['diabetes', 'hypertension', 'ihd', 'ckd', 'stroke', 'heart-failure', 'hyperlipidemia', 'previous-surgery'].forEach(condition => {
+            document.getElementById(condition).checked = d.medicalConditions?.includes(document.getElementById(condition).value) || false;
+        });
+        
+        // Medications checkboxes
+        ['aspirin', 'clopidogrel', 'statins', 'insulin', 'metformin', 'other-meds'].forEach(med => {
+            document.getElementById(med).checked = d.medications?.includes(document.getElementById(med).value) || false;
+        });
+        
+        // Procedure details
+        document.getElementById("surgery-limb").value = d.affectedLimb || "";
+        ['sfa', 'popliteal', 'pta', 'ata', 'tpt', 'peroneal'].forEach(segment => {
+            document.getElementById(segment).checked = d.angioplastySegments?.includes(document.getElementById(segment).value) || false;
+        });
+        document.getElementById("surgery-date").value = d.angioplastyDate || "";
+        document.getElementById("surgery-success").value = d.radiologicalSuccess || "";
+        
+        // Outcomes
+        document.querySelector(`input[name="wound-healed"][value="${d.woundHealed}"]`).checked = true;
+        document.getElementById("healing-time").value = d.healingTime || "";
+        
+        // Amputation data
+        document.querySelector(`input[name="amputation"][value="${d.amputation === 'Yes' ? 'Yes' : 'No'}"]`).checked = true;
+        if (d.amputationType) {
+            document.querySelector(`input[name="amputation-type"][value="${d.amputationType}"]`).checked = true;
         }
         
+        // AFS Period
         if (d.afsPeriod) {
             document.querySelector(`input[name="afs-period"][value="${d.afsPeriod}"]`).checked = true;
         }
         
         // Show the form
-        showSurgeryDataForm();
+        document.getElementById("angioplasty-options-section").classList.add("hidden");
+        document.getElementById("browse-angioplasty-section").classList.add("hidden");
+        document.getElementById("surgery-data-section").classList.remove("hidden");
+        
     }).catch(error => {
         console.error("Error loading angioplasty data:", error);
+        alert("Error loading data: " + error.message);
     });
-  }
+}
 </script>
 
 </body>
