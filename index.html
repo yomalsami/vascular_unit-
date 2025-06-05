@@ -930,6 +930,28 @@
         document.getElementById("dashboard-section").classList.add("hidden");
     }
 });
+  function resetAngioplastyForm() {
+  document.getElementById("angioplastyId").value = "";
+  document.querySelectorAll("#surgery-data-section input, #surgery-data-section select, #surgery-data-section textarea").forEach(el => {
+    if (el.type === "radio" || el.type === "checkbox") {
+      el.checked = false;
+    } else {
+      el.value = "";
+    }
+  });
+
+  [
+    "current-smoker-details",
+    "previous-surgery-details",
+    "other-meds-details",
+    "healing-time-container",
+    "amputation-details",
+    "admission-reason"
+  ].forEach(id => {
+    const section = document.getElementById(id);
+    if (section) section.classList.add("hidden");
+  });
+  }
 
   function showAddPatient() {
     document.getElementById("dashboard-section").classList.add("hidden");
