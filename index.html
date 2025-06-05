@@ -493,7 +493,7 @@
 
 
   <div class="container hidden form-container" id="surgery-data-section">
-    <form id="angioplasty-form" class="form-container">
+    <form id="angioplasty-form" class="form-container" onsubmit="submitSurgeryData(event); return false;">
     <h3>Angioplasty Registry</h3>
     <input type="hidden" id="angioplastyId">
     <div class="form-section">
@@ -771,7 +771,7 @@
       </div>
     </div>
     
-    <button onclick="submitSurgeryData()">Submit</button>
+    <button type="button" onclick="submitSurgeryData()">Submit</button>
     <button class="back-btn" onclick="backToDashboard()">Back to Dashboard</button>
     <p id="surgery-submit-message" style="color: green;"></p>
   </div>
@@ -1084,8 +1084,10 @@ function loadPendingSurgeries() {
     }
   }
 
-  function submitSurgeryData() {
+  function submitSurgeryData(e) {
     // Get all selected medical conditions
+
+    if (e) e.preventDefault();
     const form = document.getElementById("angioplasty-form");
     const id = document.getElementById("angioplastyId").value;
     const conditions = [];
