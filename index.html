@@ -1085,114 +1085,76 @@ function loadPendingSurgeries() {
   }
 
   function submitSurgeryData(e) {
-    // Get all selected medical conditions
-
     if (e) e.preventDefault();
+    
     const form = document.getElementById("angioplasty-form");
     const id = document.getElementById("angioplastyId").value;
+    
+    // Get all form data
     const conditions = [];
     document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked').forEach(checkbox => {
-      if (checkbox.id === 'diabetes' || checkbox.id === 'hypertension' || checkbox.id === 'ihd' || 
-          checkbox.id === 'ckd' || checkbox.id === 'stroke' || checkbox.id === 'heart-failure' || 
-          checkbox.id === 'hyperlipidemia' || checkbox.id === 'previous-surgery') {
-        conditions.push(checkbox.value);
-      }
+        if (['diabetes', 'hypertension', 'ihd', 'ckd', 'stroke', 
+             'heart-failure', 'hyperlipidemia', 'previous-surgery'].includes(checkbox.id)) {
+            conditions.push(checkbox.value);
+        }
     });
 
-    // Get all selected medications
     const medications = [];
     document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked').forEach(checkbox => {
-      if (checkbox.id === 'aspirin' || checkbox.id === 'clopidogrel' || checkbox.id === 'statins' || 
-          checkbox.id === 'insulin' || checkbox.id === 'metformin' || checkbox.id === 'other-meds') {
-        medications.push(checkbox.value);
-      }
+        if (['aspirin', 'clopidogrel', 'statins', 'insulin', 'metformin', 'other-meds'].includes(checkbox.id)) {
+            medications.push(checkbox.value);
+        }
     });
 
-    // Get all selected angioplasty segments
     const segments = [];
     document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked').forEach(checkbox => {
-      if (checkbox.id === 'sfa' || checkbox.id === 'popliteal' || checkbox.id === 'pta' || 
-          checkbox.id === 'ata' || checkbox.id === 'tpt' || checkbox.id === 'peroneal') {
-        segments.push(checkbox.value);
-      }
+        if (['sfa', 'popliteal', 'pta', 'ata', 'tpt', 'peroneal'].includes(checkbox.id)) {
+            segments.push(checkbox.value);
+        }
     });
 
-    // Get post-intervention requirements
-    const postInterventions = [];
-    if (document.getElementById("repeat-angio").checked) postInterventions.push("Repeat angioplasty");
-    if (document.getElementById("stenting").checked) postInterventions.push("Stenting");
-    if (document.getElementById("bypass-surgery").checked) postInterventions.push("Bypass surgery");
-
-    // Get amputation data
-  const amputation = document.querySelector('input[name="amputation"]:checked')?.value || '';
-  const amputationType = document.querySelector('input[name="amputation-type"]:checked')?.value || '';
-  
-  // Get mobility data
-  const mobilityAfter = document.querySelector('input[name="mobility-after"]:checked')?.value || '';
-  const currentMobility = document.querySelector('input[name="current-mobility"]:checked')?.value || '';
-  const footwear = document.querySelector('input[name="footwear"]:checked')?.value || '';
-  
-  // Get complications
-  const complications = [];
-  if (document.getElementById("new-ulcers").checked) complications.push("New ulcers");
-  if (document.getElementById("pain-at-rest").checked) complications.push("Pain at rest");
-  if (document.getElementById("hospital-admission").checked) complications.push("Hospital admission");
-  
-  const admissionReason = document.getElementById("hospital-admission").checked 
-    ? document.getElementById("admission-reason-text").value 
-    : '';
-  
-
     const data = {
-      // Patient Information
-      name: document.getElementById("surgery-name").value,
-      bht:document.getElementById("bht").value,
-      age: parseInt(document.getElementById("surgery-age").value),
-      sex: document.getElementById("surgery-sex").value,
-      phone: document.getElementById("surgery-phone").value,
-      
-      // Lifestyle Factors
-      smokingHistory: document.querySelector('input[name="smoking"]:checked')?.value || '',
-      cigarettesPerDay: document.querySelector('input[name="smoking"]:checked')?.value === 'Current' ? 
-                        parseInt(document.getElementById("cigarettes-per-day").value) : null,
-      smokingDuration: document.querySelector('input[name="smoking"]:checked')?.value === 'Current' ? 
-                       parseInt(document.getElementById("smoking-duration").value) : null,
-      alcoholUse: document.querySelector('input[name="alcohol"]:checked')?.value || '',
-      
-      // Medical History
-      medicalConditions: conditions,
-      previousSurgeryDetails: document.getElementById("previous-surgery").checked ? 
-                             document.getElementById("previous-surgery-text").value : '',
-      medications: medications,
-      otherMedications: document.getElementById("other-meds").checked ? 
-                       document.getElementById("other-meds-text").value : '',
-      
-      // Surgical Details
-      affectedLimb: document.getElementById("surgery-limb").value,
-      angioplastySegments: segments,
-      angioplastyDate: document.getElementById("surgery-date").value,
-      radiologicalSuccess: document.getElementById("surgery-success").value,
-      
-      // Outcomes
-      woundHealed: document.querySelector('input[name="wound-healed"]:checked')?.value || '',
-      healingTime: document.querySelector('input[name="wound-healed"]:checked')?.value === 'Y' ? 
-                  parseInt(document.getElementById("healing-time").value) : null,
-      postInterventions: postInterventions,
-      satisfaction: document.querySelector('input[name="satisfaction"]:checked')?.value || '',
-      amputation: amputation,
-    amputationType: amputationType,
-      afsPeriod: document.querySelector('input[name="afs-period"]:checked')?.value || '',
-    mobilityAfter: mobilityAfter,
-    currentMobility: currentMobility,
-    footwear: footwear,
-    complications: complications,
-    admissionReason: admissionReason,
-      
-      timestamp: new Date()
+        // Patient Information
+        name: document.getElementById("surgery-name").value,
+        bht: document.getElementById("bht").value,
+        age: parseInt(document.getElementById("surgery-age").value),
+        sex: document.getElementById("surgery-sex").value,
+        phone: document.getElementById("surgery-phone").value,
+        
+        // Lifestyle Factors
+        smokingHistory: document.querySelector('input[name="smoking"]:checked')?.value || '',
+        cigarettesPerDay: document.getElementById("cigarettes-per-day").value || null,
+        smokingDuration: document.getElementById("smoking-duration").value || null,
+        alcoholUse: document.querySelector('input[name="alcohol"]:checked')?.value || '',
+        
+        // Medical History
+        medicalConditions: conditions,
+        previousSurgeryDetails: document.getElementById("previous-surgery-text").value || '',
+        medications: medications,
+        otherMedications: document.getElementById("other-meds-text").value || '',
+        
+        // Procedure Details
+        affectedLimb: document.getElementById("surgery-limb").value,
+        angioplastySegments: segments,
+        angioplastyDate: document.getElementById("surgery-date").value,
+        radiologicalSuccess: document.getElementById("surgery-success").value,
+        
+        // Outcomes
+        woundHealed: document.querySelector('input[name="wound-healed"]:checked')?.value || '',
+        healingTime: document.getElementById("healing-time").value || null,
+        amputation: document.querySelector('input[name="amputation"]:checked')?.value || 'No',
+        amputationType: document.querySelector('input[name="amputation-type"]:checked')?.value || '',
+        afsPeriod: document.querySelector('input[name="afs-period"]:checked')?.value || '',
+        timestamp: new Date()
     };
-    
 
-       if (id) {
+    // Show loading state
+    const submitBtn = document.querySelector('#angioplasty-form button[type="button"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = "Processing...";
+    submitBtn.disabled = true;
+
+    if (id) {
         // Update existing document
         db.collection("surgeryData").doc(id).update(data)
             .then(() => {
@@ -1204,6 +1166,10 @@ function loadPendingSurgeries() {
             .catch(err => {
                 console.error("Error updating document: ", err);
                 alert("Error updating data: " + err.message);
+            })
+            .finally(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
             });
     } else {
         // Add new document
@@ -1216,9 +1182,16 @@ function loadPendingSurgeries() {
             .catch(err => {
                 console.error("Error adding document: ", err);
                 alert("Error submitting data: " + err.message);
+            })
+            .finally(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
             });
     }
   }
+
+
+   
   function toggleAmputationDetails() {
   const amputationYes = document.getElementById("amputation-yes").checked;
   document.getElementById("amputation-details").classList.toggle("hidden", !amputationYes);
@@ -1407,6 +1380,8 @@ function downloadAngioplastyExcel() {
     XLSX.writeFile(workbook, "angioplasty_data.xlsx");
 }
   function editAngioplasty(id) {
+    console.log("Editing document with ID:", id); // Debug log
+    
     db.collection("surgeryData").doc(id).get().then(doc => {
         if (!doc.exists) {
             alert("No such document!");
@@ -1414,25 +1389,26 @@ function downloadAngioplastyExcel() {
         }
 
         const d = doc.data();
+        console.log("Document data:", d); // Debug log
+        
+        // Set the hidden ID field
         document.getElementById("angioplastyId").value = id;
         
-        // Helper function to safely set values
-        function setValue(id, value) {
-            const element = document.getElementById(id);
-            if (element) element.value = value || "";
-        }
-
-        // Helper function to safely check radio buttons
-        function checkRadio(name, value) {
+        // Helper functions
+        const setValue = (id, value) => {
+            const el = document.getElementById(id);
+            if (el) el.value = value || "";
+        };
+        
+        const checkRadio = (name, value) => {
             const radio = document.querySelector(`input[name="${name}"][value="${value}"]`);
             if (radio) radio.checked = true;
-        }
-
-        // Helper function to safely check checkboxes
-        function checkCheckbox(id, shouldCheck) {
-            const checkbox = document.getElementById(id);
-            if (checkbox) checkbox.checked = shouldCheck;
-        }
+        };
+        
+        const checkCheckbox = (id, shouldCheck) => {
+            const cb = document.getElementById(id);
+            if (cb) cb.checked = shouldCheck;
+        };
 
         // Basic patient info
         setValue("surgery-name", d.name);
@@ -1447,7 +1423,7 @@ function downloadAngioplastyExcel() {
         setValue("smoking-duration", d.smokingDuration);
         checkRadio("alcohol", d.alcoholUse);
         
-        // Medical history checkboxes
+        // Medical history
         checkCheckbox("diabetes", d.medicalConditions?.includes("Diabetes Mellitus"));
         checkCheckbox("hypertension", d.medicalConditions?.includes("Hypertension"));
         checkCheckbox("ihd", d.medicalConditions?.includes("Ischemic Heart Disease"));
@@ -1496,7 +1472,7 @@ function downloadAngioplastyExcel() {
         console.error("Error loading angioplasty data:", error);
         alert("Error loading data: " + error.message);
     });
-}
+  }
 </script>
 
 </body>
