@@ -284,6 +284,20 @@
       background-color: #343a40;
     }
 
+    button[onclick^="delete"] {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button[onclick^="delete"]:hover {
+    background-color: #c82333;
+}
+
     /* Tables */
     table {
       width: 100%;
@@ -1306,12 +1320,25 @@ function loadAngioplastyData() {
                     <td>${d.angioplastyDate || ""}</td>
                     <td>${d.radiologicalSuccess || ""}</td>
                     <td>${d.woundHealed || ""}</td>
-                    <td><button onclick="editAngioplasty('${doc.id}')">Edit</button></td>
+                    <td><button onclick="editAngioplasty('${doc.id}')">Edit</button><button onclick="deleteAngioplasty('${doc.id}')" style="background-color: #dc3545; margin-top: 5px;">Delete</button></td>
                 </tr>`;
         });
         tbody.innerHTML = rows || "<tr><td colspan='12'>No angioplasty data found.</td></tr>";
     });
 }
+  function deleteAngioplasty(id) {
+    if (confirm("Are you sure you want to delete this angioplasty record? This action cannot be undone.")) {
+        db.collection("surgeryData").doc(id).delete()
+            .then(() => {
+                alert("Record deleted successfully!");
+                loadAngioplastyData(); // Refresh the table
+            })
+            .catch(error => {
+                console.error("Error deleting document: ", error);
+                alert("Error deleting record: " + error.message);
+            });
+    }
+  }
 
 function filterAngioplasty() {
     const input = document.getElementById("angioSearchInput").value.toLowerCase();
