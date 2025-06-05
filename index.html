@@ -498,6 +498,7 @@
     <input type="hidden" id="angioplastyId">
     <div class="form-section">
       <h4>Patient Information</h4>
+      
       <label>Name</label>
       <input type="text" id="surgery-name">
       
@@ -1085,117 +1086,96 @@ function loadPendingSurgeries() {
   }
 
   function submitSurgeryData(e) {
-    if (e) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
-    
-    const id = document.getElementById("angioplastyId").value;
-    const submitBtn = e ? e.target : document.querySelector('#surgery-data-section button[onclick="submitSurgeryData()"]');
-    
-    // Store original button state
-    const originalText = submitBtn.textContent;
-    submitBtn.textContent = "Processing...";
-    submitBtn.disabled = true;
-    
-    // Get all form data
-    const conditions = [];
-    document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked').forEach(checkbox => {
-        if (['diabetes', 'hypertension', 'ihd', 'ckd', 'stroke', 
-             'heart-failure', 'hyperlipidemia', 'previous-surgery'].includes(checkbox.id)) {
-            conditions.push(checkbox.value);
-        }
-    });
-
-    const medications = [];
-    document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked').forEach(checkbox => {
-        if (['aspirin', 'clopidogrel', 'statins', 'insulin', 'metformin', 'other-meds'].includes(checkbox.id)) {
-            medications.push(checkbox.value);
-        }
-    });
-
-    const segments = [];
-    document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked').forEach(checkbox => {
-        if (['sfa', 'popliteal', 'pta', 'ata', 'tpt', 'peroneal'].includes(checkbox.id)) {
-            segments.push(checkbox.value);
-        }
-    });
-
-    const data = {
-        // Patient Information
-        name: document.getElementById("surgery-name").value,
-        bht: document.getElementById("bht").value,
-        age: parseInt(document.getElementById("surgery-age").value),
-        sex: document.getElementById("surgery-sex").value,
-        phone: document.getElementById("surgery-phone").value,
-        
-        // Lifestyle Factors
-        smokingHistory: document.querySelector('input[name="smoking"]:checked')?.value || '',
-        cigarettesPerDay: document.getElementById("cigarettes-per-day").value || null,
-        smokingDuration: document.getElementById("smoking-duration").value || null,
-        alcoholUse: document.querySelector('input[name="alcohol"]:checked')?.value || '',
-        
-        // Medical History
-        medicalConditions: conditions,
-        previousSurgeryDetails: document.getElementById("previous-surgery-text").value || '',
-        medications: medications,
-        otherMedications: document.getElementById("other-meds-text").value || '',
-        
-        // Procedure Details
-        affectedLimb: document.getElementById("surgery-limb").value,
-        angioplastySegments: segments,
-        angioplastyDate: document.getElementById("surgery-date").value,
-        radiologicalSuccess: document.getElementById("surgery-success").value,
-        
-        // Outcomes
-        woundHealed: document.querySelector('input[name="wound-healed"]:checked')?.value || '',
-        healingTime: document.getElementById("healing-time").value || null,
-        amputation: document.querySelector('input[name="amputation"]:checked')?.value || 'No',
-        amputationType: document.querySelector('input[name="amputation-type"]:checked')?.value || '',
-        afsPeriod: document.querySelector('input[name="afs-period"]:checked')?.value || '',
-        timestamp: new Date()
-    };
-
-    // Show loading state
-    
-
-    if (id) {
-        console.log("Updating existing record with ID:", id); // Debug
-        db.collection("surgeryData").doc(id).update(data)
-            .then(() => {
-                console.log("Successfully updated record"); // Debug
-                alert("Data updated successfully!");
-                document.getElementById("angioplastyId").value = "";
-                document.getElementById("surgery-data-section").reset();
-                backToDashboard();
-            })
-            .catch(err => {
-                console.error("Update error:", err); // Debug
-                alert("Error updating data: " + err.message);
-            })
-            .finally(() => {
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-            });
-    } else {
-        console.log("Creating new record"); // Debug
-        db.collection("surgeryData").add(data)
-            .then(() => {
-                console.log("Successfully created record"); // Debug
-                alert("Data submitted successfully!");
-                document.getElementById("surgery-data-section").reset();
-                backToDashboard();
-            })
-            .catch(err => {
-                console.error("Create error:", err); // Debug
-                alert("Error submitting data: " + err.message);
-            })
-            .finally(() => {
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-            });
-    }
+  if (e) {
+    e.preventDefault();
+    e.stopPropagation();
   }
+
+  const id = document.getElementById("angioplastyId").value;
+  const submitBtn = e ? e.target : document.querySelector('#surgery-data-section button[onclick="submitSurgeryData(event)"]');
+  const originalText = submitBtn.textContent;
+  submitBtn.textContent = "Processing...";
+  submitBtn.disabled = true;
+
+  const getCheckedValues = (ids) => {
+    const values = [];
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.checked) values.push(el.value);
+    });
+    return values;
+  };
+
+  const data = {
+    // Patient Info
+    name: document.getElementById("surgery-name").value,
+    bht: document.getElementById("bht").value,
+    age: parseInt(document.getElementById("surgery-age").value),
+    sex: document.getElementById("surgery-sex").value,
+    phone: document.getElementById("surgery-phone").value,
+
+    // Lifestyle
+    smokingHistory: document.querySelector('input[name="smoking"]:checked')?.value || '',
+    cigarettesPerDay: document.getElementById("cigarettes-per-day").value || null,
+    smokingDuration: document.getElementById("smoking-duration").value || null,
+    alcoholUse: document.querySelector('input[name="alcohol"]:checked')?.value || '',
+
+    // Medical History
+    medicalConditions: getCheckedValues([
+      "diabetes", "hypertension", "ihd", "ckd", "stroke",
+      "heart-failure", "hyperlipidemia", "previous-surgery"
+    ]),
+    previousSurgeryDetails: document.getElementById("previous-surgery-text").value || '',
+    medications: getCheckedValues([
+      "aspirin", "clopidogrel", "statins", "insulin", "metformin", "other-meds"
+    ]),
+    otherMedications: document.getElementById("other-meds-text").value || '',
+
+    // Procedure
+    affectedLimb: document.getElementById("surgery-limb").value,
+    angioplastySegments: getCheckedValues([
+      "sfa", "popliteal", "pta", "ata", "tpt", "peroneal"
+    ]),
+    angioplastyDate: document.getElementById("surgery-date").value,
+    radiologicalSuccess: document.getElementById("surgery-success").value,
+
+    // Outcomes
+    woundHealed: document.querySelector('input[name="wound-healed"]:checked')?.value || '',
+    healingTime: document.getElementById("healing-time").value || null,
+    amputation: document.querySelector('input[name="amputation"]:checked')?.value || 'No',
+    amputationType: document.querySelector('input[name="amputation-type"]:checked')?.value || '',
+    afsPeriod: document.querySelector('input[name="afs-period"]:checked')?.value || '',
+    timestamp: new Date()
+  };
+
+  const collectionRef = db.collection("surgeryData");
+
+  const finish = (message) => {
+    alert(message);
+    resetAngioplastyForm();
+    backToDashboard();
+    submitBtn.textContent = originalText;
+    submitBtn.disabled = false;
+  };
+
+  if (id) {
+    collectionRef.doc(id).update(data)
+      .then(() => finish("Data updated successfully!"))
+      .catch(err => {
+        alert("Update failed: " + err.message);
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      });
+  } else {
+    collectionRef.add(data)
+      .then(() => finish("Data submitted successfully!"))
+      .catch(err => {
+        alert("Submission failed: " + err.message);
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      });
+  }
+      }
 
 
    
