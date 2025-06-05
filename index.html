@@ -493,7 +493,7 @@
 
 
   <div class="container hidden form-container" id="surgery-data-section">
-    <form id="angioplasty-form" class="form-container" onsubmit="submitSurgeryData(event); return false;">
+    
     <h3>Angioplasty Registry</h3>
     <input type="hidden" id="angioplastyId">
     <div class="form-section">
@@ -771,7 +771,7 @@
       </div>
     </div>
     
-    <button type="button" onclick="submitSurgeryData()">Submit</button>
+    <button type="button" onclick="submitSurgeryData(event)">Submit</button>
     <button class="back-btn" onclick="backToDashboard()">Back to Dashboard</button>
     <p id="surgery-submit-message" style="color: green;"></p>
   </div>
@@ -794,7 +794,7 @@
       <p class="action-description">View and analyze angioplasty data</p>
       <button class="action-button">Browse</button>
     </div>
-  </form>
+  
   </div>
 
   <button class="back-btn" onclick="backToDashboard()">Back to Dashboard</button>
@@ -1085,10 +1085,18 @@ function loadPendingSurgeries() {
   }
 
   function submitSurgeryData(e) {
-    if (e) e.preventDefault();
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
     
-    const form = document.getElementById("angioplasty-form");
     const id = document.getElementById("angioplastyId").value;
+    const submitBtn = e ? e.target : document.querySelector('#surgery-data-section button[onclick="submitSurgeryData()"]');
+    
+    // Store original button state
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = "Processing...";
+    submitBtn.disabled = true;
     
     // Get all form data
     const conditions = [];
@@ -1149,22 +1157,20 @@ function loadPendingSurgeries() {
     };
 
     // Show loading state
-    const submitBtn = document.querySelector('#angioplasty-form button[type="button"]');
-    const originalText = submitBtn.textContent;
-    submitBtn.textContent = "Processing...";
-    submitBtn.disabled = true;
+    
 
     if (id) {
-        // Update existing document
+        console.log("Updating existing record with ID:", id); // Debug
         db.collection("surgeryData").doc(id).update(data)
             .then(() => {
+                console.log("Successfully updated record"); // Debug
                 alert("Data updated successfully!");
                 document.getElementById("angioplastyId").value = "";
-                form.reset();
+                document.getElementById("surgery-data-section").reset();
                 backToDashboard();
             })
             .catch(err => {
-                console.error("Error updating document: ", err);
+                console.error("Update error:", err); // Debug
                 alert("Error updating data: " + err.message);
             })
             .finally(() => {
@@ -1172,15 +1178,16 @@ function loadPendingSurgeries() {
                 submitBtn.disabled = false;
             });
     } else {
-        // Add new document
+        console.log("Creating new record"); // Debug
         db.collection("surgeryData").add(data)
             .then(() => {
+                console.log("Successfully created record"); // Debug
                 alert("Data submitted successfully!");
-                form.reset();
+                document.getElementById("surgery-data-section").reset();
                 backToDashboard();
             })
             .catch(err => {
-                console.error("Error adding document: ", err);
+                console.error("Create error:", err); // Debug
                 alert("Error submitting data: " + err.message);
             })
             .finally(() => {
@@ -1312,7 +1319,7 @@ function loadAngioplastyData() {
                     <td>${d.angioplastyDate || ""}</td>
                     <td>${d.radiologicalSuccess || ""}</td>
                     <td>${d.woundHealed || ""}</td>
-                    <td><button onclick="editAngioplasty('${doc.id}')">Edit</button><button onclick="deleteAngioplasty('${doc.id}')" style="background-color: #dc3545; margin-top: 5px;">Delete</button></td>
+                    <td><button onclick="event.stopPropagation(); editAngioplasty('${doc.id}')">Edit</button>`<button onclick="deleteAngioplasty('${doc.id}')" style="background-color: #dc3545; margin-top: 5px;">Delete</button></td>
                 </tr>`;
         });
         tbody.innerHTML = rows || "<tr><td colspan='12'>No angioplasty data found.</td></tr>";
