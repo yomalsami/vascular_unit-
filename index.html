@@ -488,9 +488,11 @@
   </div>
 
   <!-- Angioplasty Registry Form -->
+
+
   <div class="container hidden form-container" id="surgery-data-section">
     <h3>Angioplasty Registry</h3>
-    
+    <input type="hidden" id="angioplastyId">
     <div class="form-section">
       <h4>Patient Information</h4>
       <label>Name</label>
@@ -922,6 +924,9 @@
   }
 
   function showSurgeryDataForm() {
+    // Clear any existing edit ID
+    document.getElementById("angioplastyId").value = "";
+    
     // Hide other sections
     document.getElementById("dashboard-section").classList.add("hidden");
     document.getElementById("angioplasty-options-section").classList.add("hidden");
@@ -929,7 +934,7 @@
     
     // Show form
     document.getElementById("surgery-data-section").classList.remove("hidden");
-  }
+}
 
   function backToDashboard() {
   // Hide all sections
@@ -1109,6 +1114,7 @@ function loadPendingSurgeries() {
   const admissionReason = document.getElementById("hospital-admission").checked 
     ? document.getElementById("admission-reason-text").value 
     : '';
+  const id = document.getElementById("angioplastyId").value;
 
     const data = {
       // Patient Information
@@ -1157,17 +1163,31 @@ function loadPendingSurgeries() {
       
       timestamp: new Date()
     };
+    
 
-    db.collection("surgeryData").add(data)
-      .then(() => {
-        document.getElementById("surgery-submit-message").innerText = "Surgery data submitted successfully!";
-        // Clear form
-        document.querySelectorAll("#surgery-data-section input:not([type='radio']):not([type='checkbox']), #surgery-data-section textarea, #surgery-data-section select").forEach(el => el.value = '');
-        document.querySelectorAll("#surgery-data-section input[type='radio'], #surgery-data-section input[type='checkbox']").forEach(el => el.checked = false);
-      })
-      .catch(err => {
-        document.getElementById("surgery-submit-message").innerText = err.message;
-      });
+       if (id) {
+        // Update existing document
+        db.collection("surgeryData").doc(id).update(data)
+            .then(() => {
+                document.getElementById("surgery-submit-message").innerText = "Data updated successfully!";
+                // Clear the form and ID
+                document.getElementById("angioplastyId").value = "";
+                document.getElementById("surgery-data-section").reset();
+            })
+            .catch(err => {
+                document.getElementById("surgery-submit-message").innerText = err.message;
+            });
+    } else {
+        // Add new document
+        db.collection("surgeryData").add(data)
+            .then(() => {
+                document.getElementById("surgery-submit-message").innerText = "Data submitted successfully!";
+                document.getElementById("surgery-data-section").reset();
+            })
+            .catch(err => {
+                document.getElementById("surgery-submit-message").innerText = err.message;
+            });
+       }
   }
   function toggleAmputationDetails() {
   const amputationYes = document.getElementById("amputation-yes").checked;
@@ -1343,6 +1363,7 @@ function downloadAngioplastyExcel() {
   function editAngioplasty(id) {
     db.collection("surgeryData").doc(id).get().then(doc => {
         const d = doc.data();
+      document.getElementById("angioplastyId").value = id;
         
         // Basic patient info
         document.getElementById("surgery-name").value = d.name || "";
