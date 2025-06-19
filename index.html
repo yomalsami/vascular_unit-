@@ -947,10 +947,8 @@
     loadPatients();
   }
 
-  function showSurgeryDataForm(e) {
-    if (e) e.preventDefault();
-    // Clear any existing edit ID
-    document.getElementById("angioplastyId").value = "";
+  function showSurgeryDataForm() {
+    
     
     // Hide other sections
     document.getElementById("dashboard-section").classList.add("hidden");
