@@ -1085,12 +1085,9 @@ function loadPendingSurgeries() {
         });
     }
   }
-
-  function submitSurgeryData() {
-
+function submitSurgeryData() {
   const id = document.getElementById("angioplastyId").value;
   
-
   const getCheckedValues = (ids) => {
     const values = [];
     ids.forEach(id => {
@@ -1142,35 +1139,35 @@ function loadPendingSurgeries() {
     timestamp: new Date()
   };
 
-  const collectionRef = db.collection("surgeryData");
-
   if (id) {
-  collectionRef.doc(id).update(data)
-    .then(() => {
-      document.getElementById("angioplastyId").value = "";
-      // Clear all inputs and textareas inside the angioplasty form
-      document.querySelectorAll("#surgery-data-section input, #surgery-data-section textarea").forEach(el => el.value = "");
-      // Also uncheck all checkboxes and radios
-      document.querySelectorAll("#surgery-data-section input[type=checkbox], #surgery-data-section input[type=radio]").forEach(el => el.checked = false);
-      alert("Surgery data updated successfully!");
-    })
-    .catch(err => {
-      alert("Update failed: " + err.message);
-    });
-} else {
-  collectionRef.add(data)
-    .then(() => {
-      document.getElementById("angioplastyId").value = "";
-      // Clear all inputs and textareas inside the angioplasty form
-      document.querySelectorAll("#surgery-data-section input, #surgery-data-section textarea").forEach(el => el.value = "");
-      // Also uncheck all checkboxes and radios
-      document.querySelectorAll("#surgery-data-section input[type=checkbox], #surgery-data-section input[type=radio]").forEach(el => el.checked = false);
-      alert("Surgery data submitted successfully!");
-    })
-    .catch(err => {
-      alert("Submission failed: " + err.message);
-    });
-}
+    // Update existing record
+    db.collection("surgeryData").doc(id).update(data)
+      .then(() => {
+        alert("Angioplasty record updated successfully!");
+        showBrowseAngioplasty(); // Return to browse view
+      })
+      .catch(err => {
+        alert("Update failed: " + err.message);
+      });
+  } else {
+    // Create new record
+    db.collection("surgeryData").add(data)
+      .then(() => {
+        alert("New angioplasty record created successfully!");
+        // Clear form
+        document.querySelectorAll("#surgery-data-section input, #surgery-data-section textarea").forEach(el => {
+          if (el.type !== 'button' && el.type !== 'submit') {
+            el.value = '';
+          }
+        });
+        document.querySelectorAll("#surgery-data-section input[type=checkbox], #surgery-data-section input[type=radio]").forEach(el => {
+          el.checked = false;
+        });
+      })
+      .catch(err => {
+        alert("Submission failed: " + err.message);
+      });
+  }
 }
 
 
