@@ -772,7 +772,7 @@
       </div>
     </div>
     
-    <button type="button" onclick="submitSurgeryData(event)">Submit</button>
+		<button type="button" onclick="submitSurgeryData()">Submit</button>
     <button class="back-btn" onclick="backToDashboard()">Back to Dashboard</button>
     <p id="surgery-submit-message" style="color: green;"></p>
   </div>
@@ -1086,17 +1086,10 @@ function loadPendingSurgeries() {
     }
   }
 
-  function submitSurgeryData(e) {
-  if (e) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
+  function submitSurgeryData() {
 
   const id = document.getElementById("angioplastyId").value;
-  const submitBtn = e ? e.target : document.querySelector('#surgery-data-section button[onclick="submitSurgeryData(event)"]');
-  const originalText = submitBtn.textContent;
-  submitBtn.textContent = "Processing...";
-  submitBtn.disabled = true;
+  
 
   const getCheckedValues = (ids) => {
     const values = [];
@@ -1151,13 +1144,7 @@ function loadPendingSurgeries() {
 
   const collectionRef = db.collection("surgeryData");
 
-  const finish = (message) => {
-    alert(message);
-    resetAngioplastyForm();
-    backToDashboard();
-    submitBtn.textContent = originalText;
-    submitBtn.disabled = false;
-  };
+  
 
   if (id) {
   collectionRef.doc(id).update(data)
@@ -1167,8 +1154,7 @@ function loadPendingSurgeries() {
     })
     .catch(err => {
       alert("Update failed: " + err.message);
-      submitBtn.textContent = originalText;
-      submitBtn.disabled = false;
+      
     });
 
 } else {
@@ -1179,8 +1165,7 @@ function loadPendingSurgeries() {
     })
     .catch(err => {
       alert("Submission failed: " + err.message);
-      submitBtn.textContent = originalText;
-      submitBtn.disabled = false;
+      
     });
 }
 }
@@ -1374,123 +1359,79 @@ function downloadAngioplastyExcel() {
     XLSX.utils.book_append_sheet(workbook, worksheet, "Angioplasty Data");
     XLSX.writeFile(workbook, "angioplasty_data.xlsx");
 }
-  function editAngioplasty(id) {
-    console.log("Editing document with ID:", id); // Debug log
-    
-    db.collection("surgeryData").doc(id).get().then(doc => {
-        if (!doc.exists) {
-            alert("No such document!");
-            return;
-        }
-
-        const d = doc.data();
-        console.log("Document data:", d); // Debug log
-        
-        // Set the hidden ID field
-        document.getElementById("angioplastyId").value = id;
-        
-        // Helper functions
-        const setValue = (id, value) => {
-            const el = document.getElementById(id);
-            if (el) el.value = value || "";
-        };
-        
-        const checkRadio = (name, value) => {
-            const radio = document.querySelector(`input[name="${name}"][value="${value}"]`);
-            if (radio) radio.checked = true;
-        };
-        
-        const checkCheckbox = (id, shouldCheck) => {
-            const cb = document.getElementById(id);
-            if (cb) cb.checked = shouldCheck;
-        };
-
-        // Basic patient info
-        setValue("surgery-name", d.name);
-        setValue("bht", d.bht);
-        setValue("surgery-age", d.age);
-        setValue("surgery-sex", d.sex);
-        setValue("surgery-phone", d.phone);
-        
-        // Lifestyle factors
-        checkRadio("smoking", d.smokingHistory);
-        setValue("cigarettes-per-day", d.cigarettesPerDay);
-        setValue("smoking-duration", d.smokingDuration);
-        checkRadio("alcohol", d.alcoholUse);
-        
-        // Medical history
-        checkCheckbox("diabetes", d.medicalConditions?.includes("Diabetes Mellitus"));
-        checkCheckbox("hypertension", d.medicalConditions?.includes("Hypertension"));
-        checkCheckbox("ihd", d.medicalConditions?.includes("Ischemic Heart Disease"));
-        checkCheckbox("ckd", d.medicalConditions?.includes("Chronic Kidney Disease"));
-        checkCheckbox("stroke", d.medicalConditions?.includes("History of Stroke"));
-        checkCheckbox("heart-failure", d.medicalConditions?.includes("Heart Failure"));
-        checkCheckbox("hyperlipidemia", d.medicalConditions?.includes("Hyperlipidemia"));
-        checkCheckbox("previous-surgery", d.medicalConditions?.includes("Previous lower limb surgery or angioplasty"));
-        setValue("previous-surgery-text", d.previousSurgeryDetails);
-        
-        // Medications
-        checkCheckbox("aspirin", d.medications?.includes("Aspirin"));
-        checkCheckbox("clopidogrel", d.medications?.includes("Clopidogrel"));
-        checkCheckbox("statins", d.medications?.includes("Statins"));
-        checkCheckbox("insulin", d.medications?.includes("Insulin"));
-        checkCheckbox("metformin", d.medications?.includes("Metformin"));
-        checkCheckbox("other-meds", d.otherMedications);
-        setValue("other-meds-text", d.otherMedications);
-        
-        // Procedure details
-        setValue("surgery-limb", d.affectedLimb);
-        checkCheckbox("sfa", d.angioplastySegments?.includes("SFA"));
-        checkCheckbox("popliteal", d.angioplastySegments?.includes("Popliteal"));
-        checkCheckbox("pta", d.angioplastySegments?.includes("PTA"));
-        checkCheckbox("ata", d.angioplastySegments?.includes("ATA"));
-        checkCheckbox("tpt", d.angioplastySegments?.includes("TPT"));
-        checkCheckbox("peroneal", d.angioplastySegments?.includes("Peroneal"));
-        setValue("surgery-date", d.angioplastyDate);
-        setValue("surgery-success", d.radiologicalSuccess);
-        
-        // Outcomes
-        checkRadio("wound-healed", d.woundHealed);
-        setValue("healing-time", d.healingTime);
-        checkRadio("amputation", d.amputation === "Yes" ? "Yes" : "No");
-        if (d.amputationType) {
-            checkRadio("amputation-type", d.amputationType);
-        }
-        if (d.afsPeriod) {
-            checkRadio("afs-period", d.afsPeriod);
-        }
-        
-        // Show the form
-        showSurgeryDataForm();
-        
-    }).catch(error => {
-        console.error("Error loading angioplasty data:", error);
-        alert("Error loading data: " + error.message);
-    });
-  }
-
-  function resetAngioplastyForm() {
-  
-  document.querySelectorAll("#surgery-data-section input, #surgery-data-section select, #surgery-data-section textarea").forEach(el => {
-    if (el.type === "radio" || el.type === "checkbox") {
-      el.checked = false;
-    } else {
-      el.value = "";
+	function editAngioplasty(id) {
+  db.collection("surgeryData").doc(id).get().then(doc => {
+    if (!doc.exists) {
+      alert("No such document!");
+      return;
     }
-  });
+    const d = doc.data();
+    
+    document.getElementById("angioplastyId").value = id;
 
-  [
-    "current-smoker-details",
-    "previous-surgery-details",
-    "other-meds-details",
-    "healing-time-container",
-    "amputation-details",
-    "admission-reason"
-  ].forEach(id => {
-    const section = document.getElementById(id);
-    if (section) section.classList.add("hidden");
+    // Set simple input/select/textarea values
+    document.getElementById("surgery-name").value = d.name || "";
+    document.getElementById("bht").value = d.bht || "";
+    document.getElementById("surgery-age").value = d.age || "";
+    document.getElementById("surgery-sex").value = d.sex || "";
+    document.getElementById("surgery-phone").value = d.phone || "";
+    document.getElementById("cigarettes-per-day").value = d.cigarettesPerDay || "";
+    document.getElementById("smoking-duration").value = d.smokingDuration || "";
+    document.getElementById("previous-surgery-text").value = d.previousSurgeryDetails || "";
+    document.getElementById("other-meds-text").value = d.otherMedications || "";
+    document.getElementById("surgery-limb").value = d.affectedLimb || "";
+    document.getElementById("surgery-date").value = d.angioplastyDate || "";
+    document.getElementById("surgery-success").value = d.radiologicalSuccess || "";
+    document.getElementById("healing-time").value = d.healingTime || "";
+
+    // For radio buttons, set checked by name and value
+    if (d.smokingHistory) {
+      const smokingRadio = document.querySelector(`input[name="smoking"][value="${d.smokingHistory}"]`);
+      if (smokingRadio) smokingRadio.checked = true;
+    }
+    if (d.alcoholUse) {
+      const alcoholRadio = document.querySelector(`input[name="alcohol"][value="${d.alcoholUse}"]`);
+      if (alcoholRadio) alcoholRadio.checked = true;
+    }
+    if (d.woundHealed) {
+      const woundRadio = document.querySelector(`input[name="wound-healed"][value="${d.woundHealed}"]`);
+      if (woundRadio) woundRadio.checked = true;
+    }
+    const amputationValue = d.amputation === "Yes" ? "Yes" : "No";
+    const amputationRadio = document.querySelector(`input[name="amputation"][value="${amputationValue}"]`);
+    if (amputationRadio) amputationRadio.checked = true;
+
+    if (d.amputationType) {
+      const ampTypeRadio = document.querySelector(`input[name="amputation-type"][value="${d.amputationType}"]`);
+      if (ampTypeRadio) ampTypeRadio.checked = true;
+    }
+    if (d.afsPeriod) {
+      const afsRadio = document.querySelector(`input[name="afs-period"][value="${d.afsPeriod}"]`);
+      if (afsRadio) afsRadio.checked = true;
+    }
+
+    // For checkboxes, check if data array includes the label text and check accordingly
+    const medicalConditions = d.medicalConditions || [];
+    ["diabetes", "hypertension", "ihd", "ckd", "stroke", "heart-failure", "hyperlipidemia", "previous-surgery"].forEach(id => {
+      const cb = document.getElementById(id);
+      if (cb) cb.checked = medicalConditions.includes(cb.value);
+    });
+
+    const medications = d.medications || [];
+    ["aspirin", "clopidogrel", "statins", "insulin", "metformin", "other-meds"].forEach(id => {
+      const cb = document.getElementById(id);
+      if (cb) cb.checked = medications.includes(cb.value);
+    });
+
+    showSurgeryDataForm();
+  }).catch(error => {
+    console.error("Error loading angioplasty data:", error);
+    alert("Error loading data: " + error.message);
   });
-  }
+}
+
+
+  
 </script>
 
 </body>
