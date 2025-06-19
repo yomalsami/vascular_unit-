@@ -931,7 +931,7 @@
     }
 });
   function resetAngioplastyForm() {
-  document.getElementById("angioplastyId").value = "";
+  
   document.querySelectorAll("#surgery-data-section input, #surgery-data-section select, #surgery-data-section textarea").forEach(el => {
     if (el.type === "radio" || el.type === "checkbox") {
       el.checked = false;
@@ -1181,23 +1181,30 @@ function loadPendingSurgeries() {
   };
 
   if (id) {
-    collectionRef.doc(id).update(data)
-      .then(() => finish("Data updated successfully!"))
-      .catch(err => {
-        alert("Update failed: " + err.message);
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-      });
-  } else {
-    collectionRef.add(data)
-      .then(() => finish("Data submitted successfully!"))
-      .catch(err => {
-        alert("Submission failed: " + err.message);
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-      });
-  }
-      }
+  collectionRef.doc(id).update(data)
+    .then(() => {
+      document.getElementById("angioplastyId").value = "";
+      finish("Data updated successfully!");
+    })
+    .catch(err => {
+      alert("Update failed: " + err.message);
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+    });
+
+} else {
+  collectionRef.add(data)
+    .then(() => {
+      document.getElementById("angioplastyId").value = ""; 
+      finish("Data submitted successfully!");
+    })
+    .catch(err => {
+      alert("Submission failed: " + err.message);
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+    });
+}
+}
 
 
    
