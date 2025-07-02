@@ -1252,7 +1252,7 @@ function toggleAdmissionReason() {
     });
   }
 
-  function downloadAngioplastyExcel() {
+ function downloadAngioplastyExcel() {
   db.collection("surgeryData").orderBy("timestamp", "desc").get().then(snapshot => {
     const rows = [[
       "Name", "BHT", "Age", "Sex", "Phone",
@@ -1279,14 +1279,14 @@ function toggleAdmissionReason() {
         d.smokingDuration || "",
         d.alcoholUse || "",
 
-        (d.medicalConditions || []).join(", "),
+        Array.isArray(d.medicalConditions) ? d.medicalConditions.join(", ") : "",
         d.previousSurgeryDetails || "",
 
-        (d.medications || []).join(", "),
+        Array.isArray(d.medications) ? d.medications.join(", ") : "",
         d.otherMedications || "",
 
         d.affectedLimb || "",
-        (d.angioplastySegments || []).join(", "),
+        Array.isArray(d.angioplastySegments) ? d.angioplastySegments.join(", ") : "",
         d.angioplastyDate || "",
         d.radiologicalSuccess || "",
 
@@ -1306,13 +1306,10 @@ function toggleAdmissionReason() {
     XLSX.utils.book_append_sheet(workbook, worksheet, "Angioplasty Data");
     XLSX.writeFile(workbook, "angioplasty_full_data.xlsx");
   }).catch(error => {
-    console.error("Error downloading data:", error);
-    alert("Failed to download: " + error.message);
+    console.error("Error downloading angioplasty data:", error);
+    alert("Failed to download data: " + error.message);
   });
 }
-
-
-  
 
   function showAngioplastyOptions(e) {
     if (e) e.preventDefault();
