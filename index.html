@@ -1252,18 +1252,65 @@ function toggleAdmissionReason() {
     });
   }
 
-  function downloadExcel() {
-    const rows = [["Name", "Age", "Gender", "Diagnosis", "Interventions", "Visit Date", "Stay", "Contact", "Notes", "Planned Surgery", "Date of Surgery", "Surgery Completed"]];
-    document.querySelectorAll("#patientTableBody tr").forEach(tr => {
-      const row = [];
-      tr.querySelectorAll("td").forEach(td => row.push(td.innerText));
-      rows.push(row);
+  function downloadAngioplastyExcel() {
+  db.collection("surgeryData").orderBy("timestamp", "desc").get().then(snapshot => {
+    const rows = [[
+      "Name", "BHT", "Age", "Sex", "Phone",
+      "Smoking History", "Cigarettes/Day", "Smoking Duration", "Alcohol Use",
+      "Medical Conditions", "Previous Surgery Details",
+      "Medications", "Other Medications",
+      "Affected Limb", "Angioplasty Segments", "Angioplasty Date", "Radiological Success",
+      "Wound Healed", "Healing Time",
+      "Amputation", "Amputation Type",
+      "AFS Period", "Timestamp"
+    ]];
+
+    snapshot.forEach(doc => {
+      const d = doc.data();
+      rows.push([
+        d.name || "",
+        d.bht || "",
+        d.age || "",
+        d.sex || "",
+        d.phone || "",
+
+        d.smokingHistory || "",
+        d.cigarettesPerDay || "",
+        d.smokingDuration || "",
+        d.alcoholUse || "",
+
+        (d.medicalConditions || []).join(", "),
+        d.previousSurgeryDetails || "",
+
+        (d.medications || []).join(", "),
+        d.otherMedications || "",
+
+        d.affectedLimb || "",
+        (d.angioplastySegments || []).join(", "),
+        d.angioplastyDate || "",
+        d.radiologicalSuccess || "",
+
+        d.woundHealed || "",
+        d.healingTime || "",
+
+        d.amputation || "",
+        d.amputationType || "",
+
+        d.afsPeriod || "",
+        d.timestamp?.toDate?.().toLocaleString?.() || ""
+      ]);
     });
+
     const worksheet = XLSX.utils.aoa_to_sheet(rows);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Patients");
-    XLSX.writeFile(workbook, "patients.xlsx");
-  }
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Angioplasty Data");
+    XLSX.writeFile(workbook, "angioplasty_full_data.xlsx");
+  }).catch(error => {
+    console.error("Error downloading data:", error);
+    alert("Failed to download: " + error.message);
+  });
+}
+
 
   
 
