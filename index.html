@@ -1384,45 +1384,7 @@ function filterAngioplasty() {
     });
 }
 
-function downloadAngioplastyExcel() {
-    const rows = [[
-        "Name", "BHT", "Age", "Sex", "Affected Limb", 
-        "Angioplasty Segments", "Amputation", "Amputation Type",
-        "AFS Period", "Date", "Success", "Wound Healed"
-    ]];
-    
-    document.querySelectorAll("#angioplastyTableBody tr").forEach(tr => {
-        const row = [];
-        // Basic info
-        row.push(tr.cells[0].innerText); // Name
-        row.push(tr.cells[1].innerText); // BHT
-        row.push(tr.cells[2].innerText); // Age
-        row.push(tr.cells[3].innerText); // Sex
-        row.push(tr.cells[4].innerText); // Affected Limb
-        row.push(tr.cells[5].innerText); // Angioplasty Segments
-        
-        // Amputation info (combined in display but separate in Excel)
-        const amputationText = tr.cells[6].innerText;
-        const amputationParts = amputationText.split(' (');
-        row.push(amputationParts[0]); // Yes/No
-        row.push(amputationParts.length > 1 ? amputationParts[1].replace(')', '') : ''); // Type
-        
-        // AFS Period
-        row.push(tr.cells[7].innerText);
-        
-        // Rest of the data
-        row.push(tr.cells[8].innerText); // Date
-        row.push(tr.cells[9].innerText); // Success
-        row.push(tr.cells[10].innerText); // Wound Healed
-        
-        rows.push(row);
-    });
-    
-    const worksheet = XLSX.utils.aoa_to_sheet(rows);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Angioplasty Data");
-    XLSX.writeFile(workbook, "angioplasty_data.xlsx");
-}
+
 	function editAngioplasty(id) {
   db.collection("surgeryData").doc(id).get().then(doc => {
     if (!doc.exists) {
