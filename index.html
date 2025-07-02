@@ -284,6 +284,27 @@
       background-color: #343a40;
     }
 
+	.floating-back-button {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background-color: var(--dark-gray);
+  color: var(--white);
+  border: none;
+  padding: 12px 18px;
+  border-radius: 50px;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  z-index: 999;
+  transition: var(--transition);
+}
+
+.floating-back-button:hover {
+  background-color: #343a40;
+}
+
+
     
 
     /* Tables */
@@ -850,6 +871,7 @@
   <button class="back-btn" onclick="backToDashboard()">Back to Dashboard</button>
 </div>
   
+<button class="floating-back-button hidden" id="floatingBackBtn" onclick="backToDashboard()">← Back</button>
 
   <footer>
     Made by <a href="https://dryomal.com" target="_blank">Dr. Yomal Amarathunge ⚕️</a>
@@ -1427,6 +1449,62 @@ function downloadAngioplastyExcel() {
     alert("Error loading data: " + error.message);
   });
 }
+
+	function updateFloatingBackButton() {
+  const dashboardVisible = !document.getElementById("dashboard-section").classList.contains("hidden");
+  const btn = document.getElementById("floatingBackBtn");
+
+  if (dashboardVisible) {
+    btn.classList.add("hidden");
+  } else {
+    btn.classList.remove("hidden");
+  }
+}
+
+// Hook into your existing navigation functions
+const originalFunctions = {
+  showAddPatient,
+  showBrowsePatients,
+  showSurgeryDataForm,
+  showAngioplastyOptions,
+  showBrowseAngioplasty,
+  showPendingSurgeries,
+  backToDashboard
+};
+
+// Override navigation functions to update back button visibility
+showAddPatient = function () {
+  originalFunctions.showAddPatient();
+  updateFloatingBackButton();
+};
+showBrowsePatients = function () {
+  originalFunctions.showBrowsePatients();
+  updateFloatingBackButton();
+};
+showSurgeryDataForm = function () {
+  originalFunctions.showSurgeryDataForm();
+  updateFloatingBackButton();
+};
+showAngioplastyOptions = function (e) {
+  originalFunctions.showAngioplastyOptions(e);
+  updateFloatingBackButton();
+};
+showBrowseAngioplasty = function (e) {
+  originalFunctions.showBrowseAngioplasty(e);
+  updateFloatingBackButton();
+};
+showPendingSurgeries = function () {
+  originalFunctions.showPendingSurgeries();
+  updateFloatingBackButton();
+};
+backToDashboard = function () {
+  originalFunctions.backToDashboard();
+  updateFloatingBackButton();
+};
+
+// Call once on initial load
+document.addEventListener("DOMContentLoaded", updateFloatingBackButton);
+
 
 
   
