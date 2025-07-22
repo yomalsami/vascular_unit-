@@ -1202,28 +1202,46 @@ function toggleAdmissionReason() {
   document.getElementById("admission-reason").classList.toggle("hidden", !admissionChecked);
 }
 
-  function loadPatients() {
-    const tbody = document.getElementById("patientTableBody");
-    tbody.innerHTML = "<tr><td colspan='8'>Loading...</td></tr>";
-    db.collection("patients").orderBy("timestamp", "desc").get().then(snapshot => {
-      let rows = "";
-      snapshot.forEach(doc => {
-        const d = doc.data();
-        rows += `
-          <tr>
-            <td>${d.name || ""}</td>
-            <td>${d.age || ""}</td>
-            <td>${d.gender || ""}</td>
-            <td>${d.diagnosis || ""}</td>
-            <td>${d.plannedSurgery || ""}</td>
-            <td>${d.dateOfSurgery || ""}</td>
-            <td>${d.surgeryCompleted || "No"}</td>
-            <td><button onclick="editPatient('${doc.id}')">Edit</button></td>
-          </tr>`;
-      });
-      tbody.innerHTML = rows || "<tr><td colspan='8'>No patients found.</td></tr>";
+ function loadPatients() {
+  const tbody = document.getElementById("patientTableBody");
+  tbody.innerHTML = "<tr><td colspan='8'>Loading...</td></tr>";
+
+  db.collection("patients").orderBy("timestamp", "desc").get().then(snapshot => {
+    let rows = "";
+
+    const batch = db.batch(); // For bulk delete if needed
+
+    snapshot.forEach(doc => {
+      const d = doc.data();
+
+      if (d.surgeryCompleted === "Yes") {
+        // Move to completedSurgeries collection
+        db.collection("completedSurgeries").doc(doc.id).set(d).then(() => {
+          db.collection("patients").doc(doc.id).delete();
+        }).catch(error => {
+          console.error("Failed to move completed patient:", error);
+        });
+        return; // Skip rendering in UI
+      }
+
+      // Add to table only if surgery is NOT completed
+      rows += `
+        <tr>
+          <td>${d.name || ""}</td>
+          <td>${d.age || ""}</td>
+          <td>${d.gender || ""}</td>
+          <td>${d.diagnosis || ""}</td>
+          <td>${d.plannedSurgery || ""}</td>
+          <td>${d.dateOfSurgery || ""}</td>
+          <td>${d.surgeryCompleted || "No"}</td>
+          <td><button onclick="editPatient('${doc.id}')">Edit</button></td>
+        </tr>`;
     });
-  }
+
+    tbody.innerHTML = rows || "<tr><td colspan='8'>No pending patients found.</td></tr>";
+  });
+}
+
 
   function editPatient(id) {
     db.collection("patients").doc(id).get().then(doc => {
