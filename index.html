@@ -1226,21 +1226,40 @@ function toggleAdmissionReason() {
 
       // Add to table only if surgery is NOT completed
       rows += `
-        <tr>
-          <td>${d.name || ""}</td>
-          <td>${d.age || ""}</td>
-          <td>${d.gender || ""}</td>
-          <td>${d.diagnosis || ""}</td>
-          <td>${d.plannedSurgery || ""}</td>
-          <td>${d.dateOfSurgery || ""}</td>
-          <td>${d.surgeryCompleted || "No"}</td>
-          <td><button onclick="editPatient('${doc.id}')">Edit</button></td>
-        </tr>`;
+  <tr>
+    <td>${d.name || ""}</td>
+    <td>${d.age || ""}</td>
+    <td>${d.gender || ""}</td>
+    <td>${d.diagnosis || ""}</td>
+    <td>${d.plannedSurgery || ""}</td>
+    <td>${d.dateOfSurgery || ""}</td>
+    <td>${d.surgeryCompleted || "No"}</td>
+    <td>
+      <button onclick="editPatient('${doc.id}')">Edit</button>
+      <button style="background-color: #dc3545; margin-top: 5px;" onclick="deletePatient('${doc.id}')">Delete</button>
+    </td>
+  </tr>`;
+
     });
 
     tbody.innerHTML = rows || "<tr><td colspan='8'>No pending patients found.</td></tr>";
   });
 }
+
+function deletePatient(id) {
+  if (confirm("Are you sure you want to delete this patient record? This action cannot be undone.")) {
+    db.collection("patients").doc(id).delete()
+      .then(() => {
+        alert("Patient record deleted successfully.");
+        loadPatients(); // Refresh table after deletion
+      })
+      .catch(error => {
+        console.error("Error deleting patient:", error);
+        alert("Failed to delete patient: " + error.message);
+      });
+  }
+}
+
 
 
   function editPatient(id) {
